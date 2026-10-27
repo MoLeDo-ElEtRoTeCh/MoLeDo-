@@ -1,4 +1,4 @@
-function saveDB(){try{localStorage.setItem('moledo_v5',JSON.stringify(DB));}catch(e){}
+function saveDB(){if(typeof sincronizarCobrancasPagas==='function')sincronizarCobrancasPagas();try{localStorage.setItem('moledo_v5',JSON.stringify(DB));}catch(e){}
   if(window._fbReady)syncToFirebase();
 }
 

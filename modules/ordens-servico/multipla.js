@@ -17,7 +17,7 @@ function gerarOSSelecionados(cId){
   var resumoLinhas=selecionados.map(function(r){
     var num2='#'+String(r.numVisual).padStart(3,'0');
     var nc=c.nome;if(c.tipo==='vc'&&r.nomeClienteFinal)nc=r.nomeClienteFinal;
-    return '<tr><td style="padding:6px;">OS '+num2+' — '+esc(r.modelo||'—')+'</td><td style="padding:6px;">'+esc(nc)+'</td><td style="padding:6px;text-align:right;font-weight:700;">'+fmtVal(r.diagnostico&&r.diagnostico.total||0)+'</td></tr>';
+    return '<tr><td style="padding:6px;">OS '+num2+' — '+esc(descricaoEquipamento(r)||'—')+'</td><td style="padding:6px;">'+esc(nc)+'</td><td style="padding:6px;text-align:right;font-weight:700;">'+fmtVal(r.diagnostico&&r.diagnostico.total||0)+'</td></tr>';
   }).join('');
   var totalHtml='<div style="page-break-before:always;max-width:800px;margin:0 auto;padding:40px 20px;">';
   totalHtml+='<div style="text-align:center;margin-bottom:16px;"><img src=\"https://moledo-eletrotech.github.io/MoLeDo-/logogarantia.png\" style=\"max-width:280px;height:auto;display:block;margin:0 auto 8px;\" alt=\"MoLeDo ElEtRoTeCh\"></div>';
@@ -90,10 +90,10 @@ function gerarOSMultipla(robos){
     var itens=r.bancada&&r.bancada.itens?r.bancada.itens:{};
     var checkHtml='<table style="width:49%;display:inline-table;border-collapse:collapse;vertical-align:top;">'+
       '<thead><tr style="background:#007ea8;color:#fff;font-size:8px;"><th style="padding:2px 4px;text-align:left;">Item</th><th style="width:20px;">✓</th><th style="width:28px;">✗</th><th style="width:28px;">N/T</th></tr></thead>'+
-      '<tbody>'+checkCol(col1,itens)+'</tbody></table>'+
+      '<tbody>'+checkCol(equipamentoEhOutro(r)?checklistParaTipo('outro').slice(0,2):col1,itens)+'</tbody></table>'+
       '<table style="width:49%;display:inline-table;border-collapse:collapse;vertical-align:top;margin-left:2%;">'+
       '<thead><tr style="background:#007ea8;color:#fff;font-size:8px;"><th style="padding:2px 4px;text-align:left;">Item</th><th style="width:20px;">✓</th><th style="width:28px;">✗</th><th style="width:28px;">N/T</th></tr></thead>'+
-      '<tbody>'+checkCol(col2,itens)+'</tbody></table>';
+      '<tbody>'+checkCol(equipamentoEhOutro(r)?checklistParaTipo('outro').slice(2):col2,itens)+'</tbody></table>';
     var diagHtml='<div style="color:#999;font-size:9px;">Não realizado</div>';
     if(r.diagnostico){
       diagHtml='';
@@ -117,7 +117,7 @@ function gerarOSMultipla(robos){
     return'<div style="border:1.5px solid '+(cancelado?'#c00':'#007ea8')+';border-radius:5px;margin-bottom:10px;overflow:hidden;position:relative;">'
       +stamp
       +'<div style="background:'+corHeader+';color:#fff;padding:5px 8px;font-size:11px;font-weight:700;">'+
-        (cancelado?'❌ CANCELADO — ':'')+num+' · '+esc(r.modelo||'—')+(r.voltagem&&r.voltagem!=='—'?' · ⚡'+r.voltagem:'')+'</div>'
+        (cancelado?'❌ CANCELADO — ':'')+num+' · '+esc(descricaoEquipamento(r)||'—')+(r.voltagem&&r.voltagem!=='—'?' · ⚡'+r.voltagem:'')+'</div>'
       +'<div style="padding:6px 8px;">'
         +'<div style="display:flex;gap:8px;font-size:9px;margin-bottom:5px;">'
           +'<span><b>Entrada:</b> '+fmtData(r.dataEntrada)+'</span>'
@@ -143,14 +143,14 @@ function gerarOSMultipla(robos){
   var resumoRows=normais.map(function(r){
     var num='#'+String(r.numVisual).padStart(3,'0');
     return'<div style="display:flex;justify-content:space-between;font-size:10px;padding:3px 0;border-bottom:1px solid #eee;">'+
-      '<span>✅ '+num+' · '+esc(r.modelo||'—')+' — Serviço concluído</span>'+
+      '<span>✅ '+num+' · '+esc(descricaoEquipamento(r)||'—')+' — Serviço concluído</span>'+
       '<span style="font-weight:700;color:#007ea8;">'+fmtVal(r.diagnostico?r.diagnostico.total||0:0)+'</span></div>';
   }).join('')+canc.map(function(r){
     var num='#'+String(r.numVisual).padStart(3,'0');
     var ab=r.diagnostico?r.diagnostico.abertura||200:200;
     var tipo=ab<=80?'diagnóstico visual':'diagnóstico com abertura';
     return'<div style="display:flex;justify-content:space-between;font-size:10px;padding:3px 0;border-bottom:1px solid #eee;">'+
-      '<span style="color:#c00;">❌ '+num+' · '+esc(r.modelo||'—')+' — Cancelado ('+tipo+')</span>'+
+      '<span style="color:#c00;">❌ '+num+' · '+esc(descricaoEquipamento(r)||'—')+' — Cancelado ('+tipo+')</span>'+
       '<span style="font-weight:700;color:#c00;">'+fmtVal(ab)+'</span></div>';
   }).join('')+(totalDescM>0?'<div style="display:flex;justify-content:space-between;font-size:10px;padding:3px 0;border-bottom:1px solid #eee;color:#c00;font-weight:700;"><span>Total de descontos aplicados</span><span>-'+fmtVal(totalDescM)+'</span></div>':'');
   // PIX
@@ -171,14 +171,14 @@ function gerarOSMultipla(robos){
     +'<style>'+css+'</style></head><body>'
     +'<div class="hdr"><img src="'+logoUrl+'" class="hdr-logo"><div class="hdr-info">R. Tietê, 3905 - Jd. América, Umuarama - PR, 87502-310 · 📞 (44) 9 9972-4074 · 📧 moledoeletrotech@gmail.com</div></div>'
     +'<div style="text-align:center;font-size:13px;font-weight:900;color:#007ea8;margin:4px 0 1px;">ORDEM DE SERVIÇO — '+esc(c.nome.toUpperCase())+'</div>'
-    +'<div style="text-align:center;font-size:8px;color:#888;margin-bottom:6px;">📞 '+esc(c.whatsapp)+' · '+robos.length+' robô(s) · '+hoje+'</div>'
+    +'<div style="text-align:center;font-size:8px;color:#888;margin-bottom:6px;">📞 '+esc(c.whatsapp)+' · '+robos.length+textoListaEquipamentos(' robô(s) · ',robos)+hoje+'</div>'
     +(atrasado?'<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:3px;padding:4px 8px;margin-bottom:6px;font-size:8.5px;color:#856404;">⚠️ Pedimos desculpas pelo prazo. Agradecemos sua paciência!</div>':'')
     +robosHtml
     +'<div style="border:1.5px solid #007ea8;border-radius:5px;margin-bottom:8px;overflow:hidden;">'
     +'<div style="background:#007ea8;color:#fff;padding:5px 8px;font-size:10px;font-weight:700;">RESUMO DE VALORES</div>'
     +'<div style="padding:8px;">'+resumoRows
     +'<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:900;padding:6px 0 2px;border-top:2px solid #007ea8;margin-top:4px;">'
-    +'<span>TOTAL GERAL ('+robos.length+' robô(s))</span><span style="color:#007ea8;">'+fmtVal(totalGeral)+'</span></div>'
+    +'<span>TOTAL GERAL ('+robos.length+textoListaEquipamentos(' robô(s)',robos)+')</span><span style="color:#007ea8;">'+fmtVal(totalGeral)+'</span></div>'
     +(canc.length?'<div style="font-size:8px;color:#888;margin-top:3px;background:#f9f9f9;padding:3px;border-radius:3px;">'+
       '* Cancelados cobrados apenas pelo diagnóstico: '+canc.map(function(r){var num='#'+String(r.numVisual).padStart(3,'0');var ab=r.diagnostico?r.diagnostico.abertura||200:200;return num+' — '+fmtVal(ab);}).join(', ')+'. Serviço completo cancelado a pedido do cliente.</div>':'')
     +'</div></div>'

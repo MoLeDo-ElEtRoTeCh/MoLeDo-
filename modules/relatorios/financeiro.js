@@ -12,7 +12,7 @@ function gerarPDFResumo(){
     var rows=robos.map(function(r){
       var c=DB.clientes.find(function(x){return x.id===r.clienteId;});
       var num='#'+String(r.numVisual).padStart(3,'0');
-      return'<tr><td style="padding:4px 6px;">'+(c?esc(c.nome):'—')+'</td><td style="padding:4px 6px;">'+num+'</td><td style="padding:4px 6px;">'+esc(r.modelo||'—')+'</td><td style="padding:4px 6px;text-align:right;font-weight:700;color:'+cor+';">'+fmtVal(getVal(r))+'</td></tr>';
+      return'<tr><td style="padding:4px 6px;">'+(c?esc(c.nome):'—')+'</td><td style="padding:4px 6px;">'+num+'</td><td style="padding:4px 6px;">'+esc(descricaoEquipamento(r)||'—')+'</td><td style="padding:4px 6px;text-align:right;font-weight:700;color:'+cor+';">'+fmtVal(getVal(r))+'</td></tr>';
     }).join('');
     return'<div style="margin-bottom:14px;"><div style="background:'+cor+';color:#fff;padding:6px 10px;font-size:12px;font-weight:700;border-radius:4px 4px 0 0;">'+titulo+'</div>'+
       '<table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #ddd;"><thead><tr style="background:#f5f5f5;"><th style="padding:4px 6px;text-align:left;">Cliente</th><th>Código</th><th>Modelo</th><th style="text-align:right;">Valor</th></tr></thead><tbody>'+rows+'</tbody></table></div>';

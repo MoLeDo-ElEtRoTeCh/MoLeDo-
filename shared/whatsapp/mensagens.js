@@ -4,6 +4,7 @@ function gerarMsgCancel(){
   var intro=CD.motivo==='sem-conserto'
     ?(_vc?'Infelizmente após análise técnica, não foi possível realizar o reparo do robô do seu cliente '+_clienteFinal+' ('+CD.num+' — '+CD.modelo+'). Sentimos muito por não poder ajudar desta vez.':'Infelizmente após análise técnica, não foi possível realizar o reparo do seu robô '+CD.num+' — '+CD.modelo+'. Sentimos muito por não poder ajudar desta vez.')
     :'Entendemos que o valor do reparo não ficou viável no momento, sem problemas! Ficamos à disposição para qualquer outra necessidade.';
+  intro=textoEquipamento(intro,_r,true);
   var msg='Oi, '+CD.cliente+'! Aqui é o técnico da MoLeDo ElEtRoTeCh.\n\n'+(_vc?'Estou falando sobre o equipamento do seu cliente '+_clienteFinal+'.\n\n':'')+intro+'\n\n';
   msg+='O valor do diagnóstico técnico é de *'+fmtVal(CD.val)+'*, que deverá ser pago para liberação do equipamento.\n\n';
   msg+='Pedimos que avise antes de vir retirar, pois às vezes estou em atendimento fora.\n\n';
@@ -23,9 +24,9 @@ function atendimentoClienteFinal(r,c){return atendimentoEhVC(r,c)?String(r.nomeC
 
 function atendimentoRefRobo(r,c,num,modelo){
   num=num||('#'+String(r&&r.numVisual||0).padStart(3,'0'));
-  modelo=modelo||String(r&&r.modelo||'—');
-  if(atendimentoEhVC(r,c))return 'o robô do seu cliente *'+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(modelo)+'*)';
-  return 'seu robô *'+num+' — '+esc(modelo)+'*';
+  modelo=modelo||String(r&&descricaoEquipamento(r)||'—');
+  if(atendimentoEhVC(r,c))return textoEquipamento('o robô do seu cliente *',r)+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(modelo)+'*)';
+  return textoEquipamento('seu robô *',r)+num+' — '+esc(modelo)+'*';
 }
 
 function atendimentoLinhaVC(r,c){
@@ -38,7 +39,7 @@ function atendimentoSaudacao(c,emoji){return 'Olá, *'+String(c&&c.nome||'client
 function prefixoMensagemAtendimento(r,c,etapa){
   var msg=atendimentoSaudacao(c,'👋');
   if(atendimentoEhVC(r,c)){
-    msg+='Estou falando sobre o robô do seu cliente *'+atendimentoClienteFinal(r,c)+'*, que foi enviado por você para a MoLeDo.\n\n';
+    msg+=textoEquipamento('Estou falando sobre o robô do seu cliente *',r)+atendimentoClienteFinal(r,c)+'*, que foi enviado por você para a MoLeDo.\n\n';
   }
   if(precisaDesculpaAtraso(r)){
     msg+='Antes de tudo, pedimos desculpas pelo atraso. Tivemos alguns imprevistos técnicos e acabamos não conseguindo cumprir o prazo previsto. Agradecemos pela compreensão e paciência. 🙏\n\n';
@@ -58,7 +59,7 @@ function gerarMsgDiag(r,c){
   var nomeNoMsg=(c?c.nome:'?');
   if(c&&c.tipo==='vc'&&r.nomeClienteFinal)nomeNoMsg='Vendedor: '+c.nome+'\nCliente: '+r.nomeClienteFinal;
   else if(c&&c.tipo==='vd')nomeNoMsg='Vendedor: '+c.nome;
-  var msg=prefixoMensagemAtendimento(r,c,'diagnostico')+L+'\n     🔧 DIAGNÓSTICO TÉCNICO\n'+L+'\nRobô: '+num+' — '+r.modelo+'\n'+(c&&(c.tipo==='vc')? nomeNoMsg : 'Cliente: '+nomeNoMsg)+'\nData: '+fmtData(d.data)+'\n';
+  var msg=prefixoMensagemAtendimento(r,c,'diagnostico')+L+'\n     🔧 DIAGNÓSTICO TÉCNICO\n'+L+textoEquipamento('\nRobô: ',r)+num+' — '+descricaoEquipamento(r)+'\n'+(c&&(c.tipo==='vc')? nomeNoMsg : 'Cliente: '+nomeNoMsg)+'\nData: '+fmtData(d.data)+'\n';
   if(d.descricao)msg+=l+'\n'+d.descricao+'\n';
   var temServicos=(d.itens&&d.itens.length)||(d.abertura>0)||(d.avulso>0)||(d.frete>0);
   if(temServicos){
@@ -135,8 +136,8 @@ function gerarMsgBancada(r,c){
   var b=r.bancada||{};
   var itens=b.itens||{};
   var msg=prefixoMensagemAtendimento(r,c,'bancada');
-  if(atendimentoEhVC(r,c))msg+='O robô do seu cliente *'+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(r.modelo||'—')+'*) acabou de dar entrada na bancada da *MoLeDo ElEtRoTeCh*! 🔧🤖\n\n';
-  else msg+='Seu robô *'+num+' — '+esc(r.modelo||'—')+'* acabou de dar entrada na bancada da *MoLeDo ElEtRoTeCh*! 🔧🤖\n\n';
+  if(atendimentoEhVC(r,c))msg+=textoEquipamento('O robô do seu cliente *',r)+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(descricaoEquipamento(r)||'—')+'*) acabou de dar entrada na bancada da *MoLeDo ElEtRoTeCh*! 🔧🤖\n\n';
+  else msg+=textoEquipamento('Seu robô *',r)+num+' — '+esc(descricaoEquipamento(r)||'—')+'* acabou de dar entrada na bancada da *MoLeDo ElEtRoTeCh*! 🔧🤖\n\n';
   // checklist
   var vieram=[];var naoVieram=[];
   checklistParaTipo(r.tipoEquipamento||'robo').forEach(function(item){

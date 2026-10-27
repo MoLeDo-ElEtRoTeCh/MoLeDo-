@@ -1,6 +1,6 @@
-// APP VERSION: TSIMP v2.11
-// BUILD: TSIMP v2.11 - busca sem perder foco + SN na bancada + camera SN no cadastro
-var APP_VERSION='TSIMP v2.11';
+// APP VERSION: TSIMP v2.12
+// BUILD: TSIMP v2.12 - busca sem perder foco + SN na bancada + camera SN no cadastro
+var APP_VERSION='TSIMP v2.12';
 var DB={clientes:[],robos:[],lixeira:[],catalogo:[],defeitosCI:[],osSeq:0};
 
 var currentTab='clientes',fichaClienteId=null,ciQty=1,ciDefects={},ciTipo='cf';

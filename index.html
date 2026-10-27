@@ -27,7 +27,7 @@ html:not([data-access-validado="sim"]) body > :not(#login-overlay):not(#qr-escol
 <body>
 <script src="shared/auth/acesso.js"></script>
 <div id="app-header">
-  <div style="position:absolute;top:8px;right:10px;z-index:5;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;color:#00b8d9;background:rgba(0,184,217,.08);border:1px solid rgba(0,184,217,.28);border-radius:7px;padding:3px 7px;letter-spacing:.4px;">Versão 2.11</div>
+  <div style="position:absolute;top:8px;right:10px;z-index:5;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;color:#00b8d9;background:rgba(0,184,217,.08);border:1px solid rgba(0,184,217,.28);border-radius:7px;padding:3px 7px;letter-spacing:.4px;">Versão 2.12</div>
   <img src="https://moledo-eletrotech.github.io/MoLeDo-/logo.png" style="max-height:115px;width:auto;display:block;margin:0 auto;" alt="MoLeDo ElEtRoTeCh">
 </div>
 <div id="alert-banner"><div id="alert-pulse"></div><div id="alert-ticker-wrap"><div id="alert-ticker"><span id="alert-text"></span></div></div></div>
@@ -173,6 +173,7 @@ html:not([data-access-validado="sim"]) body > :not(#login-overlay):not(#qr-escol
 <script src="shared/utils/moeda.js"></script>
 <script src="shared/utils/identificadores.js"></script>
 <script src="shared/utils/html.js"></script>
+<script src="shared/utils/equipamentos.js"></script>
 <script src="shared/sn/normalizacao.js"></script>
 <script src="shared/sn/validacao.js"></script>
 <script src="modules/clientes/clientes.js"></script>
@@ -265,6 +266,9 @@ html:not([data-access-validado="sim"]) body > :not(#login-overlay):not(#qr-escol
 <script src="shared/impressao/zebra/template.js"></script>
 <script src="shared/data/estado-complementar.js"></script>
 <script src="shared/impressao/zebra/locks.js"></script>
+<script src="shared/whatsapp/manual.js"></script>
+<script src="modules/clientes/equipamentos-comigo.js"></script>
+<script src="modules/financeiro/cobrancas.js"></script>
 <script src="app/inicializacao.js"></script>
 
 <!-- FIREBASE -->
@@ -738,6 +742,7 @@ function mostrarFichaCancelada(d,logoSrc){
       '<a href="tel:+5544999724074" style="display:block;background:#1a0a0a;color:#ff6666;border:1px solid rgba(255,100,100,.3);border-radius:10px;padding:14px;width:100%;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:14px;text-align:center;text-decoration:none;box-sizing:border-box;">📞 (44) 9 9972-4074 · MoLeDo ElEtRoTeCh</a>'+
       '<div style="text-align:center;padding:16px;font-size:12px;color:#553333;line-height:1.8;">MoLeDo ElEtRoTeCh<br>Reparo é nossa linguagem · Tecnologia é nossa paixão</div>'+
     '</div>';
+  adaptarFichaPublica(el,d);
   document.body.appendChild(el);
 }
 function mostrarFichaClienteCompleta(d,logoSrc){
@@ -761,8 +766,8 @@ function mostrarFichaClienteCompleta(d,logoSrc){
     {id:'mop_unico',nome:'Mop Único'},{id:'controle_remoto',nome:'Controle Remoto'}
   ];
   var itens=d.itens||{};
-  var vieram=CITENS.filter(function(i){return itens[i.id]==='veio';});
-  var naoVieram=CITENS.filter(function(i){return itens[i.id]==='nao';});
+  var vieram=(equipamentoEhOutro(d)?checklistParaTipo('outro'):CITENS).filter(function(i){return itens[i.id]==='veio';});
+  var naoVieram=(equipamentoEhOutro(d)?checklistParaTipo('outro'):CITENS).filter(function(i){return itens[i.id]==='nao';});
   var checkHtml='';
   if(vieram.length){
     checkHtml+='<div style="font-size:11px;font-weight:700;color:#00b8d9;letter-spacing:2px;text-transform:uppercase;margin:14px 0 8px;border-bottom:1px solid #1e2d45;padding-bottom:4px;">📦 Itens recebidos</div>';
@@ -818,6 +823,7 @@ function mostrarFichaClienteCompleta(d,logoSrc){
       '<a href="tel:+5544999724074" style="display:block;background:#1e2d45;color:#00e5ff;border:1px solid rgba(0,229,255,.3);border-radius:10px;padding:14px;width:100%;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:14px;text-align:center;text-decoration:none;box-sizing:border-box;">📞 (44) 9 9972-4074 · MoLeDo ElEtRoTeCh</a>'+
       '<div style="text-align:center;padding:16px;font-size:12px;color:#556688;line-height:1.8;">MoLeDo ElEtRoTeCh<br>Reparo é nossa linguagem · Tecnologia é nossa paixão</div>'+
     '</div>';
+  adaptarFichaPublica(el,d);
   document.body.appendChild(el);
 }
 

@@ -44,7 +44,7 @@ function salvarAgendamento(roboId,enviarWA){
     var num=r.numOS||('#'+String(r.numVisual).padStart(3,'0'));
     var dataFmt=new Date(data+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
     var levar=r.agendamentoTipo==='levar';
-    var msg=atendimentoSaudacao(c,'😊')+(atendimentoEhVC(r,c)?'O robô do seu cliente *'+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(r.modelo||'—')+'*) está pronto! ✅🤖\n\n':'Seu robô *'+num+' — '+esc(r.modelo||'—')+'* está pronto! ✅🤖\n\n');
+    var msg=atendimentoSaudacao(c,'😊')+(atendimentoEhVC(r,c)?textoEquipamento('O robô do seu cliente *',r)+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(descricaoEquipamento(r)||'—')+'*) está pronto! ✅🤖\n\n':textoEquipamento('Seu robô *',r)+num+' — '+esc(descricaoEquipamento(r)||'—')+'* está pronto! ✅🤖\n\n');
     msg+=(levar?'🚗 *Estarei entregando* até você':'🏪 *Pode vir buscar* aqui')+' no dia:\n';
     msg+='📅 *'+dataFmt+'*\n';
     if(hora)msg+='⏰ *Horário:* '+hora+'\n';

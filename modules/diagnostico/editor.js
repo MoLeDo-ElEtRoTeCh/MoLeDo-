@@ -1,9 +1,15 @@
 function abrirDiagnostico(roboId,snJaConferido){
   var r=DB.robos.find(function(x){return x.id===roboId;});if(!r)return;
+  if(!temSnValido(r.sn)&&r.snDecisaoDiagnostico!=='sem_codigo'){
+    openModal('<div class="modal-title">Deseja inserir o SN deste equipamento?</div><div class="modal-actions">'+
+      '<button class="btn btn-cyan" onclick="iniciarFluxoSN(\''+r.id+'\',\'diagnostico\')">INSERIR SN</button>'+
+      '<button class="btn btn-close" onclick="diagnosticoSemCodigo(\''+r.id+'\')">SEM CÓDIGO</button></div>');
+    return;
+  }
   var c=DB.clientes.find(function(x){return x.id===r.clienteId;});
   diagRoboId=roboId;parcelaSel=2;
   var snInfo=temSnValido(r.sn)?r.sn:'SEM CÓDIGO';
-  document.getElementById('diag-robo-info').textContent=(c?c.nome+' — ':'')+('#'+String(r.numVisual).padStart(3,'0'))+' · '+r.modelo+' · SN: '+snInfo;
+  document.getElementById('diag-robo-info').textContent=(c?c.nome+' — ':'')+('#'+String(r.numVisual).padStart(3,'0'))+' · '+descricaoEquipamento(r)+' · SN: '+snInfo;
   renderDiagContent(r);document.getElementById('diag-overlay').classList.add('open');
 }
 
@@ -155,4 +161,10 @@ function salvarDiagnosticoEEnviar(){
     waTipoAtual='diagnostico';
     abrirWhatsApp(r.id);
   },300);
+}
+
+function diagnosticoSemCodigo(id){
+  var r=DB.robos.find(function(x){return x.id===id;});if(!r)return;
+  r.snDecisaoDiagnostico='sem_codigo';
+  saveDB();closeModal();abrirDiagnostico(id);
 }

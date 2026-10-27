@@ -40,7 +40,7 @@ function renderFila(){
           '<div class="card" style="border-color:'+(atrasou?'#ff4444':'#c77dff')+';">'+
           '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'+
           '<div><div class="robot-num" style="color:#c77dff;">'+num+'</div>'+
-          '<div class="robot-model">'+esc(r.modelo||'—')+'</div>'+
+          '<div class="robot-model">'+esc(descricaoEquipamento(r)||'—')+'</div>'+
           (ap&&ap.dataPrevista?'<div style="font-size:11px;color:'+(atrasou?'#ff4444':'#c77dff')+';">'+(atrasou?'⚠️ Peça atrasada':'📅 Prev: '+fmtData(ap.dataPrevista))+'</div>':'')+'</div>'+
           '<div style="text-align:right;">'+
           '<div style="font-size:28px;font-weight:700;color:'+(atrasou?'#ff4444':'#c77dff')+';">'+Math.abs(diasFalta)+'</div>'+

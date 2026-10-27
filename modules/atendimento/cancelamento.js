@@ -2,7 +2,7 @@ function abrirCancelamento(roboId){
   var r=DB.robos.find(function(x){return x.id===roboId;});if(!r)return;
   var c=DB.clientes.find(function(x){return x.id===r.clienteId;});
   var num='#'+String(r.numVisual).padStart(3,'0');
-  CD={roboId:roboId,num:num,modelo:r.modelo,cliente:c?c.nome:'?',val:r.diagnostico?r.diagnostico.abertura:200,wa:c?c.whatsapp:'',motivo:''};
+  CD={roboId:roboId,num:num,modelo:descricaoEquipamento(r),cliente:c?c.nome:'?',val:r.diagnostico?r.diagnostico.abertura:200,wa:c?c.whatsapp:'',motivo:''};
   openModal(
     '<div class="modal-title danger">❌ Cancelar Reparo — '+num+'</div>'+
     '<div class="form-group"><label class="form-label">1. Valor do Diagnóstico</label>'+

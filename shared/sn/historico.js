@@ -12,7 +12,7 @@ function mostrarHistoricoSN(sn,ignorarId){
     var cx=DB.clientes.find(function(c){return c.id===x.clienteId;});
     var dg=x.diagnostico;
     return '<div style="padding:9px 0;border-bottom:1px solid var(--border);">'+
-      '<div style="font-weight:800;color:var(--cyan);">'+esc(fmtData(x.dataEntrada))+' · '+esc(x.modelo||'—')+'</div>'+
+      '<div style="font-weight:800;color:var(--cyan);">'+esc(fmtData(x.dataEntrada))+' · '+esc(descricaoEquipamento(x)||'—')+'</div>'+
       '<div style="font-size:12px;color:var(--text2);">'+esc(cx?cx.nome:'Cliente não localizado')+' · '+(x.status==='garantia'?'🛡️ Garantia':x.status==='reparo'?'🔧 Reparo':'📁 '+esc(x.status||'—'))+'</div>'+
       (dg?'<div style="font-size:12px;color:var(--text3);margin-top:4px;">💊 '+esc(dg.descricao||'Diagnóstico salvo')+(dg.total!=null?' · '+fmtVal(dg.total):'')+'</div>':'<div style="font-size:12px;color:var(--text3);margin-top:4px;">Sem diagnóstico salvo</div>')+
     '</div>';

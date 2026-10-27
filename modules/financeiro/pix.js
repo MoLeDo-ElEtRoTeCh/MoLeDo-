@@ -35,7 +35,7 @@ function renderCobrancaPix(c,robos){
     return'<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">'+
       '<input type="checkbox" id="pix-chk-'+r.id+'"'+(sel?' checked':'')+' onchange="togglePixSel(\''+r.id+'\')" style="width:16px;height:16px;cursor:pointer;">'+
       '<div style="flex:1;">'+
-        '<div style="font-size:13px;font-weight:700;color:'+(cancelado?'#ff4444':'var(--text)')+';">'+num+' · '+esc(r.modelo||'—')+(cancelado?' <span style="font-size:10px;background:rgba(255,0,0,.12);color:#ff4444;padding:1px 5px;border-radius:4px;">CANCELADO</span>':'')+'</div>'+
+        '<div style="font-size:13px;font-weight:700;color:'+(cancelado?'#ff4444':'var(--text)')+';">'+num+' · '+esc(descricaoEquipamento(r)||'—')+(cancelado?' <span style="font-size:10px;background:rgba(255,0,0,.12);color:#ff4444;padding:1px 5px;border-radius:4px;">CANCELADO</span>':'')+'</div>'+
         (cancelado?'<div style="font-size:10px;color:#ff9999;">Cobra só diagnóstico/abertura</div>':'')+
       '</div>'+
       '<div style="font-size:13px;font-weight:900;color:'+(cancelado?'#ff6666':'#00e676')+';">'+fmtVal(val)+'</div>'+
@@ -44,7 +44,7 @@ function renderCobrancaPix(c,robos){
   var wa=(c.whatsapp||'').replace(/\D/g,'');
   if(wa.length===11)wa='55'+wa;
   var msgWA='Olá, *'+esc(c.nome)+'*! 😊\n\n'+
-    'Segue o valor referente ao serviço do seu robô:\n\n'+
+    textoListaEquipamentos('Segue o valor referente ao serviço do seu robô:\n\n',robos)+
     '💵 *Total: '+fmtVal(total)+'*\n\n'+
     'A chave PIX está logo abaixo! 😊\n\n'+
     '_MoLeDo ElEtRoTeCh_';

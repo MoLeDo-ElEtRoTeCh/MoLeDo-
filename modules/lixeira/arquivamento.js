@@ -3,7 +3,7 @@ function moverParaLixeira(roboId){
   var c=DB.clientes.find(function(x){return x.id===r.clienteId;});
   var num='#'+String(r.numVisual).padStart(3,'0');
   openModal('<div class="modal-title danger">🗑️ Mover para Lixeira</div>'+
-    '<div style="font-size:13px;color:var(--text2);margin-bottom:16px;">O robô <strong style="color:var(--cyan);">'+num+'</strong>'+(c?' de <strong>'+esc(c.nome)+'</strong>':'')+' será movido para a lixeira.</div>'+
+    textoEquipamento('<div style="font-size:13px;color:var(--text2);margin-bottom:16px;">O robô <strong style="color:var(--cyan);">',r)+num+'</strong>'+(c?' de <strong>'+esc(c.nome)+'</strong>':'')+' será movido para a lixeira.</div>'+
     '<div class="modal-actions"><button class="btn btn-close" onclick="closeModal()">Cancelar</button><button class="btn btn-del" onclick="executarMoverLixeira(\''+roboId+'\')">🗑️ Mover</button></div>');
 }
 

@@ -24,4 +24,4 @@ function renderTab(tab){
   else if(tab==='relatorio')renderRelatorio();
 }
 
-function renderAll(){purgarLixeira();purgarLembretesFeitos();updateAlertBanner();renderBadges();renderTab(currentTab);renderContador();criarBotaoFlutuante();}
+function renderAll(){if(typeof sincronizarCobrancasPagas==='function')sincronizarCobrancasPagas();purgarLixeira();purgarLembretesFeitos();updateAlertBanner();renderBadges();renderTab(currentTab);renderContador();criarBotaoFlutuante();}

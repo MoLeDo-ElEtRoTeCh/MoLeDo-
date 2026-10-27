@@ -19,7 +19,7 @@ function gerarOSHtml(r,c){
   // Info
   h+='<table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px;">';
   h+='<tr><td style="padding:4px;width:50%;"><b>Cliente:</b> '+esc(nomeCliente)+'</td>';
-  h+='<td style="padding:4px;"><b>Modelo:</b> '+esc(r.modelo||'—')+'</td></tr>';
+  h+='<td style="padding:4px;"><b>Modelo:</b> '+esc(descricaoEquipamento(r)||'—')+'</td></tr>';
   h+='<tr><td style="padding:4px;"><b>Data:</b> '+fmtData(d.data)+'</td>';
   h+='<td style="padding:4px;"><b>Voltagem:</b> '+(r.voltagem||'—')+'</td></tr>';
   if(d.descricao){h+='<tr><td colspan="2" style="padding:4px;"><b>Diagnóstico:</b> '+esc(d.descricao)+'</td></tr>';}
@@ -78,6 +78,7 @@ function gerarOS(roboId,roboOverride){
   ];
   var itens=r.bancada&&r.bancada.itens?r.bancada.itens:{};
   // Checklist em 2 colunas
+  if(equipamentoEhOutro(r))CITENS=checklistParaTipo('outro');
   var metade=Math.ceil(CITENS.length/2);
   function checkCol(lista){
     return lista.map(function(item,i){
@@ -191,8 +192,8 @@ function gerarOS(roboId,roboOverride){
     // EQUIPAMENTO em grid 3 colunas
     +'<div class="sec"><div class="sec-t">Dados do Equipamento</div><div class="sec-b">'
     +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;">'
-    +'<div class="row"><span class="lbl">Modelo:</span><span class="val">'+esc(r.modelo||'—')+'</span></div>'
-    +'<div class="row"><span class="lbl">Entrada:</span><span class="val">'+esc(({robo:'Somente robô',robo_base:'Robô + base',robo_estacao:'Robô + estação',placa_robo:'Somente placa do robô',placa_estacao:'Somente placa da estação'})[r.tipoEquipamento||'robo']||'Somente robô')+'</span></div>'
+    +'<div class="row"><span class="lbl">Modelo:</span><span class="val">'+esc(descricaoEquipamento(r)||'—')+'</span></div>'
+    +'<div class="row"><span class="lbl">Entrada:</span><span class="val">'+esc(({robo:textoEquipamento('Somente robô',r),robo_base:textoEquipamento('Robô + base',r),robo_estacao:textoEquipamento('Robô + estação',r),placa_robo:textoEquipamento('Somente placa do robô',r),placa_estacao:'Somente placa da estação'})[r.tipoEquipamento||'robo']||textoEquipamento('Somente robô',r))+'</span></div>'
     +'<div class="row"><span class="lbl">Código/SN:</span><span class="val">'+esc(r.sn||'Sem código')+'</span></div>'
     +'<div class="row"><span class="lbl">Voltagem:</span><span class="val">'+esc(r.voltagem||'—')+'</span></div>'
     +(r.bancada?'<div class="row"><span class="lbl">Outra assist.:</span><span class="val">'+(r.bancada.outraAssistencia==='sim'?'Sim':'Não')+'</span></div>':'')

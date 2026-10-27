@@ -21,9 +21,10 @@ function buildRoboBlock(n){
       catsCI[cat].map(function(d){return'<button type="button" class="defect-btn" onclick="toggleDef('+n+',this,\''+d.nome.replace(/'/g,"\\'")+'\')">'+esc(d.nome)+'</button>';}).join('')+'</div>';
   }).join('');
   return'<div class="robot-block"><div class="robot-block-title"><span class="robot-num">#'+num+'</span> EQUIPAMENTO '+num+'</div>'+
-    '<div class="form-group"><label class="form-label">Tipo de entrada</label><select id="ci-tipo-equip-'+n+'" class="form-input">'+
-      '<option value="robo">🤖 Somente robô</option><option value="robo_base">🤖 + 🔌 Robô + base</option><option value="robo_estacao">🤖 + 🏠 Robô + estação</option><option value="placa_robo">🔧 Somente placa do robô</option><option value="placa_estacao">🔧 Somente placa da estação</option>'+
+    '<div class="form-group"><label class="form-label">Tipo de entrada</label><select id="ci-tipo-equip-'+n+'" class="form-input" onchange="alternarOutroEquipamento('+n+')">'+
+      '<option value="outro">OUTRO EQUIPAMENTO</option><option value="robo" selected>🤖 Somente robô</option><option value="robo_base">🤖 + 🔌 Robô + base</option><option value="robo_estacao">🤖 + 🏠 Robô + estação</option><option value="placa_robo">🔧 Somente placa do robô</option><option value="placa_estacao">🔧 Somente placa da estação</option>'+
     '</select></div>'+
+    '<div id="ci-outro-wrap-'+n+'" class="form-group" style="display:none"><label class="form-label">Tipo / nome do equipamento *</label><input id="ci-outro-'+n+'" class="form-input" placeholder="Ex.: Ventilador, Frigobar"></div>'+
     '<div class="form-group"><label class="form-label">Código / SN</label>'+
     '<div style="display:flex;gap:7px;align-items:center;"><input id="ci-sn-'+n+'" class="form-input" type="text" placeholder="Ex: 54784/DUAA8F5SF00855" oninput="this.dataset.snOrigem=\'manual\'" style="flex:1;">'+
     '<input id="ci-sn-camera-'+n+'" type="file" accept="image/*" capture="environment" style="display:none;" onchange="processarFotoSNParaCampo(this,\'ci-sn-'+n+'\',\'ci-nosn-'+n+'\')">'+

@@ -14,7 +14,7 @@ function renderGarantia(){
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'+
         '<div><div class="cliente-label">'+(c?esc(c.nome.toUpperCase()):'?')+'</div>'+
         '<div class="robot-num" style="color:#ce93d8;">'+num+'</div><div class="robot-sn">'+esc(r.sn)+'</div>'+
-        '<div class="robot-model">'+esc(r.modelo)+'</div>'+(r.voltagem&&r.voltagem!=='—'?'<div class="robot-volt">⚡ '+esc(r.voltagem)+'</div>':'')+
+        '<div class="robot-model">'+esc(descricaoEquipamento(r))+'</div>'+(r.voltagem&&r.voltagem!=='—'?'<div class="robot-volt">⚡ '+esc(r.voltagem)+'</div>':'')+
         '</div><div style="text-align:right;"><div class="garantia-shield">🛡️</div><div class="garantia-days">'+rest+'</div><div class="days-label">dias rest.</div></div></div>'+
         '<span class="status-badge status-garantia">🛡️ Em Garantia</span>'+
         (r.defeitos&&r.defeitos.length?'<div class="robot-defects">'+r.defeitos.map(function(d){return'<span class="defect-chip">'+esc(d)+'</span>';}).join('')+'</div>':'')+

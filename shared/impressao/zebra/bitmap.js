@@ -92,7 +92,7 @@ async function zebraRenderizarCanvas(r,c){
   var ehVC=zebraVendedorCliente(r,c);
   var nomeClienteFinal=ehVC?String(r.nomeClienteFinal||'').trim().toUpperCase():'';
   var nomeVendedorCurto=ehVC?zebraPrimeiroNome(c.nome).toUpperCase():'';
-  var modelo=String(r.modelo||'—').trim().toUpperCase();
+  var modelo=String(descricaoEquipamento(r)||'—').trim().toUpperCase();
   var sn=String(r.sn||'SEM CÓDIGO').trim().toUpperCase();
   var entrada=fmtData(r.dataEntrada);
   var volt=String(r.voltagem||'—').trim().toUpperCase();

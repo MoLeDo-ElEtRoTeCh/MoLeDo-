@@ -20,8 +20,8 @@ function renderDiagnosticoLista(){
     return'<div class="card'+(tem?' diag-card':'')+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;">'+
       '<div><div class="cliente-label">'+(c?esc(c.nome.toUpperCase()):'?')+'</div>'+
-      '<div class="robot-num">'+num+'</div><div class="robot-model">'+esc(r.modelo)+'</div></div>'+
-      '<div style="text-align:right;">'+(tem?'<div style="color:var(--yellow);font-size:11px;font-weight:700;">💊 Salvo</div><div style="font-size:12px;color:var(--text2);">'+fmtVal(r.diagnostico.total)+'</div>':'<div style="font-size:11px;color:var(--text3);">⏳ Sem diagnóstico</div>')+'</div></div>'+
+      '<div class="robot-num">'+num+'</div><div class="robot-model">'+esc(descricaoEquipamento(r))+'</div></div>'+
+      '<div style="text-align:right;">'+(tem?'<div style="color:var(--yellow);font-size:11px;font-weight:700;">💊 Salvo</div><div style="font-size:12px;color:var(--text2);">'+fmtVal(r.diagnostico.total)+'</div><div class="diag-data">'+fmtData(r.diagnostico.data)+'</div>':'<div style="font-size:11px;color:var(--text3);">⏳ Sem diagnóstico</div>')+'</div></div>'+
       '<div class="robot-actions" style="margin-top:10px;">'+
       (tem
         ?'<button class="btn btn-yellow" onclick="abrirDiagnostico(\''+r.id+'\')">💊 Editar Diagnóstico</button>'

@@ -36,7 +36,7 @@ function renderRelatorio(){
         var dias=diasDesde(r.dataEntrada);
         html2+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">'+
           '<div>'+
-            '<div style="font-size:13px;font-weight:700;">'+num+' · '+esc(r.modelo||'—')+'</div>'+
+            '<div style="font-size:13px;font-weight:700;">'+num+' · '+esc(descricaoEquipamento(r)||'—')+'</div>'+
             '<div style="font-size:11px;color:var(--text3);">'+esc(c?c.nome:'?')+'</div>'+
             (r.diagnostico?'<div style="font-size:11px;color:var(--yellow);">'+fmtVal(r.diagnostico.total)+'</div>':'')+'</div>'+
           '<div style="text-align:right;">'+
@@ -60,7 +60,7 @@ function renderRelatorio(){
     if(r.status==='garantia')meses[mes].concluidos++;
     if(r.motivo==='cancelamento')meses[mes].cancelados++;
     if(r.diagnostico&&r.diagnostico.total)meses[mes].faturamento+=r.diagnostico.total;
-    if(r.modelo)meses[mes].modelos[r.modelo]=(meses[mes].modelos[r.modelo]||0)+1;
+    if(descricaoEquipamento(r))meses[mes].modelos[descricaoEquipamento(r)]=(meses[mes].modelos[descricaoEquipamento(r)]||0)+1;
     if(r.defeitos)r.defeitos.forEach(function(d){meses[mes].defeitos[d]=(meses[mes].defeitos[d]||0)+1;});
   });
   var lista=Object.values(meses).sort(function(a,b){return b.mes>a.mes?1:-1;});
@@ -68,7 +68,7 @@ function renderRelatorio(){
   var todosModelos={},todosDefeitos={};
   todos.forEach(function(r){
     if(!r)return;
-    if(r.modelo)todosModelos[r.modelo]=(todosModelos[r.modelo]||0)+1;
+    if(descricaoEquipamento(r))todosModelos[descricaoEquipamento(r)]=(todosModelos[descricaoEquipamento(r)]||0)+1;
     if(r.defeitos)r.defeitos.forEach(function(d){todosDefeitos[d]=(todosDefeitos[d]||0)+1;});
   });
   var topModelos=Object.entries(todosModelos).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
@@ -120,7 +120,7 @@ function renderRelatorio(){
         var num2='#'+String(r.numVisual).padStart(3,'0');
         var dias2=diasDesde(r.dataEntrada);
         html+='<div style="font-size:12px;display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);">'+
-          '<span>'+num2+' '+esc(r.modelo||'—')+' · '+esc(c2?c2.nome:'?')+(r.aguardandoPeca?' 📦':'')+'</span>'+
+          '<span>'+num2+' '+esc(descricaoEquipamento(r)||'—')+' · '+esc(c2?c2.nome:'?')+(r.aguardandoPeca?' 📦':'')+'</span>'+
           '<span style="color:var(--orange);">'+dias2+'d</span></div>';
       });
       html+='</div>';

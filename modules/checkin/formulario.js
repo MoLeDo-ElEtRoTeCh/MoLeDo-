@@ -51,7 +51,7 @@ function restaurarDadosBlocos(){
     var obs=document.getElementById('ci-obs-'+i);
     var nosn=document.getElementById('ci-nosn-'+i);
     if(sn)sn.value=d.sn;
-    if(modelo)modelo.value=d.modelo;
+    if(modelo)modelo.value=descricaoEquipamento(d);
     if(obs)obs.value=d.obs;
     var oi=document.getElementById('ci-obs-int-'+i);if(oi)oi.value=d.obsInterna||'';
     var tp=document.getElementById('ci-tipo-equip-'+i);if(tp&&d.tipoEquip)tp.value=d.tipoEquip;

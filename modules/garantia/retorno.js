@@ -13,5 +13,5 @@ function confirmarVoltarReparo(roboId){
   if(!r.mensagens)r.mensagens=[];
   r.mensagens.push({data:todayISO(),tipo:'voltouReparo'});
   saveDB();closeModal();renderAll();
-  showToast('🔄 Robô voltou para reparo!');
+  showToast(textoEquipamento('🔄 Robô voltou para reparo!',r));
 }

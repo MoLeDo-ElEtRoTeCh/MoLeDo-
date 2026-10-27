@@ -54,7 +54,7 @@ function renderModoTV(){
       hV+='<div style="display:flex;gap:20px;align-items:flex-start;">'+
         '<div style="flex:1;">'+
           '<div style="font-size:44px;font-weight:900;color:'+cor.cor+';margin-bottom:8px;line-height:1.1;">'+esc(nome)+'</div>'+
-          '<div style="font-size:24px;color:#aaa;font-family:\'Rajdhani\',sans-serif;margin-bottom:8px;">'+num+' · '+esc(i.r.modelo||'—')+' · <span style="color:'+cor.cor+';font-weight:900;">'+i.dias+' dias</span></div>'+
+          '<div style="font-size:24px;color:#aaa;font-family:\'Rajdhani\',sans-serif;margin-bottom:8px;">'+num+' · '+esc(descricaoEquipamento(i.r)||'—')+' · <span style="color:'+cor.cor+';font-weight:900;">'+i.dias+' dias</span></div>'+
           '<div style="font-size:20px;color:#888;font-family:\'Rajdhani\',sans-serif;margin-bottom:18px;">'+esc(defeitos)+'</div>'+
           '<div style="display:flex;gap:10px;">'+
             '<button onclick="tvMover(\''+i.r.id+'\',\'amarelo\')" style="'+tvBtnStyle('#ffd600')+'font-size:16px;padding:10px 20px;">🟡 Mover p/ Próximo</button>'+
@@ -136,7 +136,7 @@ function tvAbrirDetalhe(roboId){
     '<div style="background:#0d0d0d;border:2px solid '+cor.cor+';border-radius:16px;padding:28px 32px;max-width:520px;width:90%;position:relative;">'+
       '<button onclick="tvFecharDetalhe()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:#555;font-size:20px;cursor:pointer;">✕</button>'+
       '<div style="font-size:26px;font-weight:900;color:'+cor.cor+';margin-bottom:6px;">'+esc(nome)+'</div>'+
-      '<div style="font-size:14px;color:#aaa;font-family:\'Rajdhani\',sans-serif;margin-bottom:4px;">'+num+' · '+esc(r.modelo||'—')+' · <b style="color:'+cor.cor+';">'+dias+' dias</b></div>'+
+      '<div style="font-size:14px;color:#aaa;font-family:\'Rajdhani\',sans-serif;margin-bottom:4px;">'+num+' · '+esc(descricaoEquipamento(r)||'—')+' · <b style="color:'+cor.cor+';">'+dias+' dias</b></div>'+
       '<div style="font-size:13px;color:#777;font-family:\'Rajdhani\',sans-serif;margin-bottom:20px;">'+esc(defeitos)+'</div>'+
       '<div style="display:flex;justify-content:center;margin-bottom:20px;">'+
         '<img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&margin=0&data='+encodeURIComponent(appUrl)+'" style="border-radius:6px;border:2px solid '+cor.cor+'44;">'+

@@ -2,8 +2,8 @@ function reativarRobo(itemId){
   var item=DB.lixeira.find(function(x){return x.id===itemId;});if(!item)return;
   var r=item.robo;
   var num='#'+String(r.numVisual).padStart(3,'0');
-  openModal('<div class="modal-title">🔄 Reativar Robô</div>'+
-    '<div style="font-size:13px;color:var(--text2);margin-bottom:16px;">O robô <strong style="color:var(--cyan);">'+num+' — '+esc(r.modelo||'—')+'</strong> de <strong>'+esc(item.nomeCliente)+'</strong> voltará para a fila de reparo com todos os dados anteriores.</div>'+
+  openModal(textoEquipamento('<div class="modal-title">🔄 Reativar Robô</div>',r)+
+    textoEquipamento('<div style="font-size:13px;color:var(--text2);margin-bottom:16px;">O robô <strong style="color:var(--cyan);">',r)+num+' — '+esc(descricaoEquipamento(r)||'—')+'</strong> de <strong>'+esc(item.nomeCliente)+'</strong> voltará para a fila de reparo com todos os dados anteriores.</div>'+
     '<div class="modal-actions">'+
     '<button class="btn btn-close" onclick="closeModal()">Cancelar</button>'+
     '<button class="btn btn-primary" onclick="executarReativarRobo(\''+itemId+'\')">🔄 Reativar</button>'+
@@ -26,7 +26,7 @@ function executarReativarRobo(itemId){
   // Remove da lixeira
   DB.lixeira=DB.lixeira.filter(function(x){return x.id!==itemId;});
   saveDB();closeModal();renderAll();
-  showToast('✅ Robô '+('#'+String(r.numVisual).padStart(3,'0'))+' reativado com sucesso!');
+  showToast(textoEquipamento('✅ Robô ',r)+('#'+String(r.numVisual).padStart(3,'0'))+' reativado com sucesso!');
   // Vai para aba fila
   switchTab('fila');
 }

@@ -27,7 +27,7 @@ function openClienteDetalhe(id){
 function refreshFichaContent(){
   if(!fichaClienteId)return;
   var robos=DB.robos.filter(function(r){return r.clienteId===fichaClienteId;});
-  document.getElementById('ficha-content').innerHTML=robos.length?robos.map(function(r){return renderRoboCard(r,true);}).join(''):'<div class="empty-state"><div class="empty-icon">🤖</div><p>Nenhum robô.</p></div>';
+  document.getElementById('ficha-content').innerHTML=blocoEquipamentosComigo(fichaClienteId)+(robos.length?robos.map(function(r){return renderRoboCard(r,true);}).join(''):'<div class="empty-state"><div class="empty-icon">🤖</div><p>Nenhum equipamento.</p></div>');
 }
 
 function closeClienteDetalhe(){document.getElementById('ficha-overlay').classList.remove('open');fichaClienteId=null;renderClientes();}

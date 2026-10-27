@@ -1,9 +1,9 @@
 function iniciarFluxoSN(roboId,tipo){
   var r=DB.robos.find(function(x){return x.id===roboId;});if(!r)return;
   snFluxo={roboId:roboId,tipo:tipo||'cadastro',original:r.sn||'',resultado:null};
-  var titulo=tipo==='garantia'?'🛡️ Conferir SN do retorno':'🔐 Identificar SN do robô';
+  var titulo=tipo==='garantia'?'🛡️ Conferir SN do retorno':textoEquipamento('🔐 Identificar SN do robô',r);
   var texto=tipo==='garantia'
-    ?'Antes de voltar este equipamento para reparo, confirme o número de série do robô que retornou. Ele será comparado com o SN registrado no atendimento original.'
+    ?textoEquipamento('Antes de voltar este equipamento para reparo, confirme o número de série do robô que retornou. Ele será comparado com o SN registrado no atendimento original.',r)
     :'Informe o SN manualmente ou use a câmera para a IA ler a etiqueta.';
   var original=(tipo==='garantia'&&temSnValido(r.sn))
     ?'<div style="margin:9px 0;padding:9px 11px;background:rgba(199,125,255,.08);border:1px solid rgba(199,125,255,.25);border-radius:8px;font-size:12px;color:var(--text2);">SN registrado: <strong style="color:#d9a7ff;font-family:\'Share Tech Mono\',monospace;">'+esc(r.sn)+'</strong></div>'
@@ -25,6 +25,7 @@ function iniciarFluxoSN(roboId,tipo){
 
 function usarSNManual(){
   var el=document.getElementById('sn-manual-input');
+  if(!temSnValido(el?el.value:'')){showToast('⚠️ Digite um SN válido.');return;}
   var sn=limparSN(el?el.value:'');
   if(!temSnValido(sn)){showToast('⚠️ Digite um SN válido.');return;}
   tratarSNObtido(sn,'manual');
@@ -55,6 +56,7 @@ function editarSNReconhecido(){
 
 function usarSNCorrecao(){
   var el=document.getElementById('sn-correcao-input');
+  if(!temSnValido(el?el.value:'')){showToast('⚠️ Digite um SN válido.');return;}
   var sn=limparSN(el?el.value:'');
   if(!temSnValido(sn)){showToast('⚠️ Digite um SN válido.');return;}
   tratarSNObtido(sn,'correcao');
@@ -76,7 +78,7 @@ function tratarSNObtido(sn,origem){
     }
     if(canonSN(sn)!==canonSN(r.sn)){
       openModal('<div class="modal-title">🚨 SN DIFERENTE — GARANTIA BLOQUEADA</div>'+
-        '<div style="font-size:13px;color:var(--text2);line-height:1.5;">O robô apresentado não corresponde ao número de série registrado neste atendimento.</div>'+
+        textoEquipamento('<div style="font-size:13px;color:var(--text2);line-height:1.5;">O robô apresentado não corresponde ao número de série registrado neste atendimento.</div>',r)+
         '<div style="margin-top:10px;padding:9px;border-radius:8px;background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.3);">'+
           '<div style="font-size:10px;color:var(--text3);">SN ORIGINAL</div><div style="font-family:\'Share Tech Mono\',monospace;color:#00e676;font-weight:900;">'+esc(r.sn)+'</div>'+
           '<div style="font-size:10px;color:var(--text3);margin-top:7px;">SN APRESENTADO</div><div style="font-family:\'Share Tech Mono\',monospace;color:#ff5252;font-weight:900;">'+esc(sn)+'</div>'+

@@ -89,8 +89,8 @@ function openFichaRobo(roboId){
   var bancadaHtml='';
   if(r.bancada){
     var b=r.bancada;var itens=b.itens||{};
-    var vieramB=CHECKLIST_ITENS.filter(function(i){return itens[i.id]==='veio';});
-    var naoVieramB=CHECKLIST_ITENS.filter(function(i){return itens[i.id]==='nao';});
+    var vieramB=(equipamentoEhOutro(r)?checklistParaTipo('outro'):CHECKLIST_ITENS).filter(function(i){return itens[i.id]==='veio';});
+    var naoVieramB=(equipamentoEhOutro(r)?checklistParaTipo('outro'):CHECKLIST_ITENS).filter(function(i){return itens[i.id]==='nao';});
     bancadaHtml='<div class="divider"></div><div class="days-label" style="margin:8px 0 5px;">📦 Itens Recebidos</div>'+
       (vieramB.length?'<div style="font-size:12px;color:#00e676;margin-bottom:4px;">'+vieramB.map(function(i){return'✅ '+i.nome;}).join(' · ')+'</div>':'')+
       (naoVieramB.length?'<div style="font-size:12px;color:#ff1744;margin-bottom:4px;">'+naoVieramB.map(function(i){return'❌ '+i.nome;}).join(' · ')+'</div>':'')+
@@ -105,7 +105,7 @@ function openFichaRobo(roboId){
     '</div>'+(c&&c.tipo==='vc'&&r.nomeClienteFinal?'<div style="margin:2px 0 8px;padding:5px 10px;background:rgba(0,200,150,.12);border-left:3px solid #00c896;border-radius:6px;"><span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;">CLIENTE FINAL</span><br><span style="font-size:15px;font-weight:900;color:#00c896;">'+esc(r.nomeClienteFinal)+'</span></div>':'')
     +'<div class="card '+cc+'" style="margin:0 0 12px;">'+
     '<div class="robot-num" style="font-size:28px;">'+num+'</div><div class="robot-sn">'+esc(r.sn)+'</div>'+
-    '<div class="robot-model" style="font-size:16px;">'+esc(r.modelo)+'</div>'+
+    '<div class="robot-model" style="font-size:16px;">'+esc(descricaoEquipamento(r))+'</div>'+
     (r.voltagem&&r.voltagem!=='—'?'<div class="robot-volt" style="font-size:13px;margin-top:4px;">⚡ '+esc(r.voltagem)+'</div>':'')+
     (temSnValido(r.sn)?'<div style="font-size:11px;color:#00e676;font-family:\'Share Tech Mono\',monospace;margin-top:4px;">🔐 SN: '+esc(r.sn)+'</div>':'<div style="font-size:11px;color:#ff6d00;margin-top:4px;">⚠️ SN não registrado</div>')+
     '<div style="margin-top:8px;">'+(si?'<span class="status-badge '+si.cls+'">'+si.txt+'</span>':'')+(r.status==='garantia'?'<span class="status-badge status-garantia">🛡️ Em Garantia</span>':'')+'</div>'+
@@ -131,7 +131,7 @@ function openFichaRobo(roboId){
 
     (r.status==='garantia'&&!r.pago?'<button class="btn btn-green" onclick="marcarRoboPago(\''+r.id+'\')">💰 Marcar Pago</button>':'')+
     (r.status==='garantia'&&!r.entregue?'<button class="btn" onclick="marcarRoboEntregue(\''+r.id+'\')" style="background:rgba(0,229,255,.15);border:1px solid rgba(0,229,255,.4);color:var(--cyan);padding:6px 12px;font-size:12px;border-radius:8px;font-family:\'Rajdhani\',sans-serif;font-weight:700;cursor:pointer;">📦 Marcar Entregue</button>':'')+
-    (r.status==='garantia'?'<button class="btn" onclick="voltarGarantiaParaReparo(\''+r.id+'\')" style="background:rgba(255,109,0,.15);border:1px solid rgba(255,109,0,.4);color:#ff6d00;padding:6px 12px;font-size:12px;border-radius:8px;font-family:\'Rajdhani\',sans-serif;font-weight:700;cursor:pointer;" title="Use esta opção se o robô voltou e precisa de novo diagnóstico ou reparo">🔄 Voltar Reparo</button>':'')+
+    (r.status==='garantia'?'<button class="btn" onclick="voltarGarantiaParaReparo(\''+r.id+textoEquipamento('\')" style="background:rgba(255,109,0,.15);border:1px solid rgba(255,109,0,.4);color:#ff6d00;padding:6px 12px;font-size:12px;border-radius:8px;font-family:\'Rajdhani\',sans-serif;font-weight:700;cursor:pointer;" title="Use esta opção se o robô voltou e precisa de novo diagnóstico ou reparo">🔄 Voltar Reparo</button>',r):'')+
     (r.status==='garantia'?'<button class="btn" onclick="republicarFichaPublica(\''+r.id+'\')" style="background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:#00e676;padding:6px 12px;font-size:12px;border-radius:8px;font-family:\'Rajdhani\',sans-serif;font-weight:700;cursor:pointer;">🔄 Republicar</button>':'')+
     '</div>'+
     // LINHA 2: fechar + hambúrguer
@@ -145,7 +145,7 @@ function abrirMenuRobo(roboId){
   var r=DB.robos.find(function(x){return x.id===roboId;});if(!r)return;
   var html='<div class="modal-title">☰ Mais Opções</div>'+
     '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">'+
-    '<button class="btn btn-edit" onclick="closeModal();editarRobo(\''+roboId+'\')" style="justify-content:flex-start;padding:10px 14px;">✏️ Editar Robô</button>'+
+    '<button class="btn btn-edit" onclick="closeModal();editarRobo(\''+roboId+textoEquipamento('\')" style="justify-content:flex-start;padding:10px 14px;">✏️ Editar Robô</button>',r)+
     '<button class="btn btn-close" onclick="closeModal();abrirNotaRapida(\''+roboId+'\')" style="justify-content:flex-start;padding:10px 14px;">📝 Nota Rápida</button>'+
     '<button class="btn btn-cyan" onclick="closeModal();gerarOS(\''+roboId+'\')" style="justify-content:flex-start;padding:10px 14px;">🖨️ Gerar OS</button>'+
     '<button class="btn" onclick="closeModal();gerarApresentacao(\''+roboId+'\')" style="justify-content:flex-start;padding:10px 14px;background:rgba(206,147,216,.15);border:1px solid rgba(206,147,216,.4);color:#ce93d8;">🎁 Folha de Apresentação</button>'+

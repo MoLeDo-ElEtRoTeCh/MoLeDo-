@@ -118,12 +118,12 @@ function tvMover(roboId,destino){
   var stAtual=_tvStatusMap[roboId]||'fila';
   // aviso se mover de vermelho/amarelo para fila
   if((stAtual==='vermelho'||stAtual==='amarelo')&&destino==='fila'){
-    if(!confirm('Este robô está há '+dias+' dias. Mover de volta para a fila?'))return;
+    if(!confirm(textoEquipamento('Este robô está há ',r)+dias+' dias. Mover de volta para a fila?'))return;
   }
   // aviso se mover da fila para amarelo (fura fila)
   if(stAtual==='fila'&&destino==='amarelo'){
     var temAmarelo=DB.robos.some(function(x){return (_tvStatusMap[x.id]||'fila')==='amarelo';});
-    if(temAmarelo&&!confirm('Já tem robô marcado como próximo. Quer colocar este na frente?'))return;
+    if(temAmarelo&&!confirm(textoEquipamento('Já tem robô marcado como próximo. Quer colocar este na frente?',r)))return;
   }
   _tvStatusMap[roboId]=destino;
   tvSalvarStatus();

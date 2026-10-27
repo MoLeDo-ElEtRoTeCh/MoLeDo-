@@ -10,7 +10,7 @@ function renderLixeira(){
         '<div><div class="cliente-label">'+esc(item.nomeCliente.toUpperCase())+'</div>'+
         '<div class="robot-num" style="color:var(--text3);text-shadow:none;">'+num+'</div>'+
         (item.motivo==='cancelamento'?'<div style="font-size:11px;color:var(--red);font-weight:700;">❌ Cancelado</div>':'')+
-        '<div class="robot-sn">'+esc(item.robo.sn)+'</div><div class="robot-model" style="color:var(--text2);">'+esc(item.robo.modelo)+'</div></div>'+
+        '<div class="robot-sn">'+esc(item.robo.sn)+'</div><div class="robot-model" style="color:var(--text2);">'+esc(descricaoEquipamento(item.robo))+'</div></div>'+
         '<div style="text-align:right;"><div style="font-size:10px;color:var(--text3);">Expira em</div>'+
         '<div style="font-family:\'Share Tech Mono\';font-size:20px;color:var(--text3);">'+rest+'</div>'+
         '<div style="font-size:10px;color:var(--text3);">dias</div></div></div>'+

@@ -48,6 +48,7 @@ function setBancadaPlacaItem(id,estado){
 }
 
 function checklistParaTipo(tipo){
+  if(tipo==='outro')return [{id:'equipamento',nome:'Equipamento'},{id:'alimentacao',nome:'Cabo / fonte'},{id:'acessorios',nome:'Acessórios'}];
   var roboIds=['vassoura_central','vassoura_lat_esq','vassoura_lat_dir','reservatorio_poco','reservatorio_agua','tampa_superior','mop_esq','mop_dir','mop_unico','controle_remoto'];
   var baseIds=['carregador_dock','cabo_carregador'];
   var estIds=['est_res_poeira','est_agua_limpa','est_agua_suja','est_rampa','est_area_limpeza','est_cabo'];
@@ -97,7 +98,7 @@ function abrirBancada(roboId){
 
   openModal(
     '<div class="modal-title">🔧 Entrada na Bancada</div>'+
-    '<div style="font-size:13px;color:var(--cyan);font-family:\'Rajdhani\',sans-serif;margin-bottom:4px;font-weight:700;">'+r.numOS+' · '+(c?esc(c.nome):'')+' · '+num+' · '+esc(r.modelo||'—')+'</div>'+
+    '<div style="font-size:13px;color:var(--cyan);font-family:\'Rajdhani\',sans-serif;margin-bottom:4px;font-weight:700;">'+r.numOS+' · '+(c?esc(c.nome):'')+' · '+num+' · '+esc(descricaoEquipamento(r)||'—')+'</div>'+
     '<div class="form-group" style="margin-top:10px;"><label class="form-label">Código / SN <span style="color:var(--yellow);font-size:10px;">CONFIRMAR NA ENTRADA DA BANCADA</span></label>'+
       '<div style="display:flex;gap:7px;align-items:center;"><input id="bancada-sn" class="form-input" type="text" value="'+(temSnValido(r.sn)?esc(r.sn):'')+'" oninput="this.dataset.snOrigem=\'bancada_manual\'" style="flex:1;text-transform:uppercase;font-family:\'Share Tech Mono\',monospace;">'+
       '<input id="bancada-sn-camera" type="file" accept="image/*" capture="environment" style="display:none;" onchange="processarFotoSNParaCampo(this,\'bancada-sn\',\'bancada-nosn\')">'+
@@ -108,7 +109,7 @@ function abrirBancada(roboId){
     // BOTÃO SÓ A PLACA
     '<div style="display:flex;gap:8px;margin-bottom:12px;">'+
       '<button id="btn-so-placa" onclick="toggleBancadaModo()" style="flex:1;padding:10px;border-radius:8px;border:1px solid '+(isModoPlaca?'var(--cyan)':'var(--border)')+';background:'+(isModoPlaca?'rgba(0,229,255,.2)':'rgba(255,255,255,.05)')+';color:'+(isModoPlaca?'var(--cyan)':'var(--text2)')+';font-family:\'Rajdhani\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">'+
-        (isModoPlaca?'🤖 Robô inteiro':'🔌 Só a Placa')+
+        (isModoPlaca?textoEquipamento('🤖 Robô inteiro',r):'🔌 Só a Placa')+
       '</button>'+
     '</div>'+
     '<div style="font-size:11px;color:var(--text3);margin-bottom:10px;">Selecione: ✅ veio · ❌ não veio · — não tem</div>'+

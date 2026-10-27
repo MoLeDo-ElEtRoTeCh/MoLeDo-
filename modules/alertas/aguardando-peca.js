@@ -1,7 +1,7 @@
 function cancelarAguardandoPeca(roboId){
   var r=DB.robos.find(function(x){return x.id===roboId;});if(!r)return;
   delete r.aguardandoPeca;saveDB();closeModal();renderAll();
-  showToast('✅ Peça chegou! Robô de volta na fila.');
+  showToast(textoEquipamento('✅ Peça chegou! Robô de volta na fila.',r));
 }
 
 function abrirAguardandoPeca(roboId){
@@ -12,7 +12,7 @@ function abrirAguardandoPeca(roboId){
   var dPrev=new Date(hoje);dPrev.setDate(dPrev.getDate()+15);
   var dPrevStr=dPrev.toISOString().split('T')[0];
   openModal('<div class="modal-title">📦 Aguardando Peça — '+num+'</div>'+
-    '<div style="font-size:13px;color:var(--text2);margin-bottom:12px;">'+esc(r.modelo)+(c?' · '+esc(c.nome):'')+'</div>'+
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:12px;">'+esc(descricaoEquipamento(r))+(c?' · '+esc(c.nome):'')+'</div>'+
     '<div class="form-group"><label class="form-label">📅 Data prevista de chegada</label>'+
     '<input id="ap-data" type="date" class="form-input" value="'+dPrevStr+'"></div>'+
     '<div class="form-group"><label class="form-label">📝 Observação (opcional)</label>'+
@@ -30,5 +30,5 @@ function salvarAguardandoPeca(roboId){
   if(!data){alert('Informe a data prevista.');return;}
   r.aguardandoPeca={dataPrevista:data,obs:obs,diasAoEntrar:Math.floor((new Date()-new Date(r.dataEntrada+'T00:00:00'))/(1000*60*60*24))};
   saveDB();closeModal();renderAll();
-  showToast('📦 Robô em aguardo de peça até '+fmtData(data)+'!');
+  showToast(textoEquipamento('📦 Robô em aguardo de peça até ',r)+fmtData(data)+'!');
 }

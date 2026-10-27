@@ -30,7 +30,7 @@ function renderRoboCard(r,showEntregue){
   }
   return'<div class="card '+cc.trim()+'">'+
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'+
-    '<div><div class="robot-num">'+num+'</div><div class="robot-sn">'+esc(r.sn)+'</div><div class="robot-model">'+esc(r.modelo)+'</div>'+(r.voltagem&&r.voltagem!=='—'?'<div class="robot-volt">⚡ '+esc(r.voltagem)+'</div>':'')+(r.nomeClienteFinal?'<div style="font-size:11px;font-weight:700;color:#00c896;margin-top:2px;">👤 '+esc(r.nomeClienteFinal)+'</div>':'')+'</div>'+
+    '<div><div class="robot-num">'+num+'</div><div class="robot-sn">'+esc(r.sn)+'</div><div class="robot-model">'+esc(descricaoEquipamento(r))+'</div>'+(r.voltagem&&r.voltagem!=='—'?'<div class="robot-volt">⚡ '+esc(r.voltagem)+'</div>':'')+(r.nomeClienteFinal?'<div style="font-size:11px;font-weight:700;color:#00c896;margin-top:2px;">👤 '+esc(r.nomeClienteFinal)+'</div>':'')+'</div>'+
     '<div style="text-align:right;">'+(r.status==='reparo'?(aguardandoRet?'<div style="font-size:24px;">📦</div><div class="days-label" style="color:#00c896;">retirada</div>':'<div class="days-big" style="color:'+dc(dias)+';'+diasCorBg+'">'+dias+'</div><div class="days-label">dias</div>'):'')+(r.status==='garantia'?'<div class="garantia-shield">🛡️</div>':'')+'</div></div>'+
     statusHtml+defHtml+diagHtml+waHtml+
     // MELHORIA 5: nota rápida visível

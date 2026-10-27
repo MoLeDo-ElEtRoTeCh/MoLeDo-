@@ -6,7 +6,7 @@ function abrirSeletorOS(){
   var todos=robos.concat(lixeira.map(function(x){return Object.assign({},x.robo,{_lixId:x.id,_cancelado:true});}));
   if(!todos.length){showToast('Nenhum robô encontrado.');return;}
   var html='<div class="modal-title">📋 Gerar OS — '+esc(c.nome)+'</div>';
-  html+='<div style="font-size:12px;color:var(--text2);margin-bottom:12px;">Selecione o(s) robô(s) para gerar a OS:</div>';
+  html+=textoListaEquipamentos('<div style="font-size:12px;color:var(--text2);margin-bottom:12px;">Selecione o(s) robô(s) para gerar a OS:</div>',todos);
   html+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">';
   todos.forEach(function(r){
     var num='#'+String(r.numVisual).padStart(3,'0');
@@ -25,7 +25,7 @@ function abrirSeletorOS(){
       '<input type="checkbox" id="os-chk-'+r.id+'" '+(temDiag?'checked':'')+' style="width:18px;height:18px;cursor:pointer;">'+
       '<label for="os-chk-'+r.id+'" style="flex:1;cursor:pointer;min-width:0;">'+
         '<div style="font-size:14px;font-weight:700;color:var(--cyan);">'+status+' '+num+'</div>'+
-        '<div style="font-size:12px;color:var(--text);">'+esc(r.modelo||'—')+cf+'</div>'+
+        '<div style="font-size:12px;color:var(--text);">'+esc(descricaoEquipamento(r)||'—')+cf+'</div>'+
         (temDiag?'<div style="font-size:11px;color:var(--green);">'+fmtVal(r.diagnostico.total||0)+(r.diagnostico.desconto>0?' <span style="color:#ff6b6b;">(desc. -'+fmtVal(r.diagnostico.desconto)+')</span>':'')+'</div>':
         '<div style="font-size:11px;color:var(--text3);">Sem diagnóstico</div>')+
         '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">'+pagamentoBadge+entregaBadge+'</div>'+
@@ -59,14 +59,14 @@ function abrirSelecaoOS(roboIdAtual){
     return'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">'+
       '<input type="checkbox" id="os-chk-'+rob.id+'" checked onchange="_osSel[\''+rob.id+'\']=this.checked" style="width:16px;height:16px;cursor:pointer;">'+
       '<div style="flex:1;">'+
-        '<div style="font-size:13px;font-weight:700;color:'+cor+';">'+num+' · '+esc(rob.modelo||'—')+(esteAtual?' <span style="font-size:10px;color:var(--cyan);">(este)</span>':'')+(cancelado?' <span style="font-size:10px;background:rgba(255,0,0,.15);color:#ff4444;padding:1px 5px;border-radius:4px;">CANCELADO</span>':'')+'</div>'+
+        '<div style="font-size:13px;font-weight:700;color:'+cor+';">'+num+' · '+esc(descricaoEquipamento(rob)||'—')+(esteAtual?' <span style="font-size:10px;color:var(--cyan);">(este)</span>':'')+(cancelado?' <span style="font-size:10px;background:rgba(255,0,0,.15);color:#ff4444;padding:1px 5px;border-radius:4px;">CANCELADO</span>':'')+'</div>'+
         '<div style="font-size:11px;color:var(--text3);">'+(tem?'💊 '+fmtVal(rob.diagnostico.total):'Sem diagnóstico')+'</div>'+
       '</div>'+
     '</div>';
   }).join('');
   openModal(
     '<div class="modal-title">🖨️ Gerar OS</div>'+
-    '<div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Selecione os robôs para incluir:</div>'+
+    textoEquipamento('<div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Selecione os robôs para incluir:</div>',r)+
     '<div style="margin-bottom:14px;">'+itensHtml+'</div>'+
     '<div class="modal-actions">'+
     '<button class="btn btn-close" onclick="closeModal()">Cancelar</button>'+
@@ -80,7 +80,7 @@ function gerarOSSelecionadas(roboIdAtual){
   var ativos=DB.robos.filter(function(x){return x.clienteId===r.clienteId&&_osSel[x.id];});
   var cancelados=(DB.lixeira||[]).filter(function(x){return x.robo&&x.robo.clienteId===r.clienteId&&x.motivo==='cancelamento'&&_osSel[x.robo.id];}).map(function(x){return Object.assign({},x.robo,{_cancelado:true});});
   var selecionados=ativos.concat(cancelados);
-  if(!selecionados.length){showToast('Selecione ao menos 1 robô.');return;}
+  if(!selecionados.length){showToast(textoEquipamento('Selecione ao menos 1 robô.',r));return;}
   closeModal();
   if(selecionados.length===1){gerarOS(selecionados[0].id);return;}
   gerarOSMultipla(selecionados);

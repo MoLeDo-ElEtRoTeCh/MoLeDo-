@@ -12,8 +12,8 @@ function abrirEtiquetasCliente(clienteId){
     var qtd=window._etqClienteCopias[r.id]||1;
     var num='#'+String(r.numVisual).padStart(3,'0');
     html+='<div style="display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--border);border-radius:9px;margin-bottom:7px;background:var(--bg2);">'+
-      '<div style="flex:1;"><div style="font-size:13px;font-weight:800;color:var(--text);">'+num+' · '+esc(r.modelo||'—')+'</div>'+
-      '<div style="font-size:10px;color:var(--text3);">Etiqueta do robô deste cliente</div></div>'+
+      '<div style="flex:1;"><div style="font-size:13px;font-weight:800;color:var(--text);">'+num+' · '+esc(descricaoEquipamento(r)||'—')+'</div>'+
+      textoEquipamento('<div style="font-size:10px;color:var(--text3);">Etiqueta do robô deste cliente</div></div>',r)+
       '<button onclick="mudarCopiaEtiquetaCliente(\''+clienteId+'\',\''+r.id+'\',-1)" style="width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-weight:900;">−</button>'+
       '<div style="min-width:22px;text-align:center;font-weight:900;color:var(--cyan);">'+qtd+'</div>'+
       '<button onclick="mudarCopiaEtiquetaCliente(\''+clienteId+'\',\''+r.id+'\',1)" style="width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-weight:900;">+</button>'+

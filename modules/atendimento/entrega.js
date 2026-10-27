@@ -2,7 +2,7 @@ function marcarRoboEntregue(roboId){
   var r=DB.robos.find(function(x){return x.id===roboId;});if(!r)return;
   var num='#'+String(r.numVisual).padStart(3,'0');
   openModal('<div class="modal-title">📦 Confirmar Entrega</div>'+
-    '<div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Confirmar entrega de <strong style="color:var(--cyan);">'+num+' — '+esc(r.modelo||'—')+'</strong>?</div>'+
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Confirmar entrega de <strong style="color:var(--cyan);">'+num+' — '+esc(descricaoEquipamento(r)||'—')+'</strong>?</div>'+
     '<div class="modal-actions">'+
     '<button class="btn btn-close" onclick="closeModal()">Cancelar</button>'+
     '<button class="btn btn-cyan" onclick="executarMarcarEntregue(\''+roboId+'\')">📦 Confirmar Entrega</button>'+
@@ -33,7 +33,7 @@ function confirmarServicoPronto(roboId,pago){
   var msg;
   if(pago){
     msg=atendimentoSaudacao(c,'😊')+
-      (atendimentoEhVC(r,c)?'O robô do seu cliente *'+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(r.modelo||'—')+'*) está com o serviço concluído e pagamento confirmado! 🤖✅\n\n':'Seu robô *'+num+' — '+esc(r.modelo||'—')+'* está com o serviço concluído e pagamento confirmado! 🤖✅\n\n')+
+      (atendimentoEhVC(r,c)?textoEquipamento('O robô do seu cliente *',r)+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(descricaoEquipamento(r)||'—')+'*) está com o serviço concluído e pagamento confirmado! 🤖✅\n\n':textoEquipamento('Seu robô *',r)+num+' — '+esc(descricaoEquipamento(r)||'—')+'* está com o serviço concluído e pagamento confirmado! 🤖✅\n\n')+
       'Como prefere prosseguir?\n\n'+
       '📦 *Envio* — posso enviar pelo correio/motoboy\n'+
       '🚶 *Retirada* — pode buscar quando quiser\n\n'+
@@ -41,7 +41,7 @@ function confirmarServicoPronto(roboId,pago){
       '_*MoLeDo ElEtRoTeCh*\nReparo é nossa linguagem · Tecnologia é nossa paixão_';
   } else {
     msg=atendimentoSaudacao(c,'😊')+
-      (atendimentoEhVC(r,c)?'Ótima notícia! O serviço do robô do seu cliente *'+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(r.modelo||'—')+'*) foi concluído com sucesso! 🤖✅\n\n':'Ótima notícia! O serviço do seu robô *'+num+' — '+esc(r.modelo||'—')+'* foi concluído com sucesso! 🤖✅\n\n')+
+      (atendimentoEhVC(r,c)?textoEquipamento('Ótima notícia! O serviço do robô do seu cliente *',r)+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(descricaoEquipamento(r)||'—')+'*) foi concluído com sucesso! 🤖✅\n\n':textoEquipamento('Ótima notícia! O serviço do seu robô *',r)+num+' — '+esc(descricaoEquipamento(r)||'—')+'* foi concluído com sucesso! 🤖✅\n\n')+
       diagValor+'\n\n'+
       'Assim que o pagamento for confirmado, acertamos a retirada ou o envio! 😊\n\n'+
       'Qual forma fica melhor pra você?\n'+
@@ -104,7 +104,7 @@ function executarEntrega(roboId,entregue,pago){
   }
   if(!entregue&&pago){
     // Pago s/entregar → alerta de entrega pendente
-    DB.lembretes.push({id:genId(),roboId:roboId,tipo:'entrega',label:'📦 Entregar robô '+num+' para '+nomeCliente+' (já pagou)',dt:hoje+'T09:00',feito:false});
+    DB.lembretes.push({id:genId(),roboId:roboId,tipo:'entrega',label:textoEquipamento('📦 Entregar robô ',r)+num+' para '+nomeCliente+' (já pagou)',dt:hoje+'T09:00',feito:false});
   }
   if(!entregue&&!pago){
     // Nem entregue nem pago → alerta dos dois
@@ -125,7 +125,8 @@ function executarEntrega(roboId,entregue,pago){
         var db2=fs.getFirestore(apps[0]);
         var dadosPub={
           numOS:r.numOS||('#'+String(r.numVisual).padStart(3,'0')),
-          modelo:r.modelo||'',
+          modelo:descricaoEquipamento(r)||'',
+          tipoEquipamento:r.tipoEquipamento||'robo',nomeTipoEquipamento:r.nomeTipoEquipamento||'',
           voltagem:r.voltagem||'',
           dataEntrada:r.dataEntrada||'',
           dataEntrega:hoje,

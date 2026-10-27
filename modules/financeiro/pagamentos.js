@@ -2,7 +2,7 @@ function marcarRoboPago(roboId){
   var r=DB.robos.find(function(x){return x.id===roboId;});if(!r)return;
   var num='#'+String(r.numVisual).padStart(3,'0');
   openModal('<div class="modal-title">💰 Confirmar Pagamento</div>'+
-    '<div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Confirmar que <strong style="color:var(--cyan);">'+num+' — '+esc(r.modelo||'—')+'</strong> foi pago?</div>'+
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Confirmar que <strong style="color:var(--cyan);">'+num+' — '+esc(descricaoEquipamento(r)||'—')+'</strong> foi pago?</div>'+
     '<div class="modal-actions">'+
     '<button class="btn btn-close" onclick="closeModal()">Cancelar</button>'+
     '<button class="btn btn-green" onclick="executarMarcarPago(\''+roboId+'\')">💰 Confirmar Pago</button>'+

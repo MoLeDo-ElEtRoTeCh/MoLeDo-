@@ -21,7 +21,7 @@ function linhaRoboFinanceiro(r,cor){
         iconeStatusFinanceiro(r)+
         '<div style="flex:1;min-width:0;">'+
           '<div style="font-size:12px;font-weight:700;color:'+(cor||'var(--text)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(c?esc(c.nome):'—')+' · '+num+(clickable?' <span style="font-size:9px;color:var(--cyan);">▼</span>':'')+'</div>'+
-          '<div style="font-size:10px;color:var(--text3);">'+esc(r.modelo||'—')+' · '+dias+'d'+(r._cancelado?' · CANCELADO':'')+'</div>'+
+          '<div style="font-size:10px;color:var(--text3);">'+esc(descricaoEquipamento(r)||'—')+' · '+dias+'d'+(r._cancelado?' · CANCELADO':'')+'</div>'+
         '</div>'+
       '</div>'+
       '<div style="font-size:13px;font-weight:900;color:'+(cor||'#00e676')+';margin-left:8px;flex-shrink:0;">'+fmtVal(val)+'</div>'+
@@ -129,5 +129,6 @@ function abrirResumoFinanceiro(mesSel){
     '<button class="btn" onclick="gerarPDFResumo()" style="width:100%;justify-content:center;background:rgba(0,229,255,.15);border:1px solid rgba(0,229,255,.4);color:var(--cyan);border-radius:8px;padding:10px;font-family:\'Rajdhani\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">📄 Gerar PDF/Imprimir</button>'+
     '<button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="closeModal()">Fechar</button>'+
     '</div>';
+  html='<button class="btn btn-cyan" style="width:100%;margin-bottom:12px" onclick="abrirPainelCobrancas()">COBRANÇAS</button>'+html;
   openModal(html);
 }

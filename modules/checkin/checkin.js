@@ -9,8 +9,9 @@ function salvarCheckin(){
   var nomeCF=ciTipo==='vc'?(document.getElementById('ci-nome-cf').value.trim()||''):'';
   for(var i=1;i<=ciQty;i++){
     var sn=document.getElementById('ci-sn-'+i).value.trim();var noSn=document.getElementById('ci-nosn-'+i).checked;
-    if(!sn&&!noSn){alert('Robô #'+String(i).padStart(3,'0')+': Informe o Código/SN.');return;}
+    if(!sn&&!noSn){alert((document.getElementById('ci-tipo-equip-'+i).value==='outro'?(document.getElementById('ci-outro-'+i).value.trim()||'Equipamento'):'Robô')+' #'+String(i).padStart(3,'0')+': Informe o Código/SN.');return;}
   }
+  for(var t=1;t<=ciQty;t++){if(document.getElementById('ci-tipo-equip-'+t).value==='outro'&&!document.getElementById('ci-outro-'+t).value.trim()){alert('Informe o tipo/nome do equipamento #'+t);return;}}
   var cliente=null;
   for(var j=0;j<DB.clientes.length;j++){if(DB.clientes[j].whatsapp===wa){cliente=DB.clientes[j];break;}}
   if(!cliente){cliente={id:genId(),nome:nome,whatsapp:wa,tipo:ciTipo,nomeClienteFinal:nomeCF};DB.clientes.push(cliente);}
@@ -21,6 +22,7 @@ function salvarCheckin(){
     DB.robos.push({id:genId(),clienteId:cliente.id,numVisual:nextNum+(k-1),
       sn:document.getElementById('ci-nosn-'+k).checked?'SEM CÓDIGO':document.getElementById('ci-sn-'+k).value.trim(),
       tipoEquipamento:(document.getElementById('ci-tipo-equip-'+k)?document.getElementById('ci-tipo-equip-'+k).value:'robo'),
+      nomeTipoEquipamento:document.getElementById('ci-tipo-equip-'+k).value==='outro'?document.getElementById('ci-outro-'+k).value.trim():'',
       modelo:document.getElementById('ci-modelo-'+k).value.trim()||'—',
       voltagem:getVolt('ci'+k),defeitos:[].concat(ciDefects[k]||[]),
       obs:document.getElementById('ci-obs-'+k).value.trim(),

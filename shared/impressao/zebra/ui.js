@@ -76,7 +76,7 @@ function zebraRobosAbaAtual(aplicarBusca){
   if(!q)return lista;
   return lista.filter(function(r){
     var c=DB.clientes.find(function(x){return x.id===r.clienteId;});
-    var hay=[c&&c.nome,r.nomeClienteFinal,r.modelo,r.sn,r.numVisual,'#'+String(r.numVisual||0).padStart(3,'0')].map(zebraNormalizarBusca).join(' ');
+    var hay=[c&&c.nome,r.nomeClienteFinal,descricaoEquipamento(r),r.sn,r.numVisual,'#'+String(r.numVisual||0).padStart(3,'0')].map(zebraNormalizarBusca).join(' ');
     return hay.indexOf(q)!==-1;
   });
 }
@@ -217,12 +217,12 @@ function renderEtiqueta(){
       var nome=zebraNomeLista(r,c),subnome=zebraSubnomeLista(r,c),copias=Math.max(1,Math.min(20,Number(etqCopias[r.id]||1)));
       var statusTxt=erroEntry?' · <span style="color:var(--orange);font-weight:800;">⚠️ erro registrado</span>':(impressa?' · <span style="color:var(--green);font-weight:800;">✅ impressão confirmada</span>':'');
       var fecharErro=erroEntry?'<button title="Encerrar aviso" class="btn btn-del" style="padding:6px 8px;font-size:11px;" onclick="event.stopPropagation();zebraAbrirFecharErro(\''+erroEntry.jobId+'\')">✕</button>':'';
-      var busca=zebraNormalizarBusca([c&&c.nome,r.nomeClienteFinal,r.modelo,r.sn,r.numVisual,'#'+String(r.numVisual||0).padStart(3,'0')].join(' '));
+      var busca=zebraNormalizarBusca([c&&c.nome,r.nomeClienteFinal,descricaoEquipamento(r),r.sn,r.numVisual,'#'+String(r.numVisual||0).padStart(3,'0')].join(' '));
       return '<div class="etq-robo-row'+(sel?' sel':'')+(impressa?' impressa':'')+'" data-etq-search="'+esc(busca)+'" onclick="toggleEtqRobo(\''+r.id+'\')">'+
         '<input type="checkbox" '+(sel?'checked':'')+' '+(locked?'disabled':'')+' onclick="event.stopPropagation();toggleEtqRobo(\''+r.id+'\')">'+
         '<div class="etq-robo-info"><div class="etq-robo-num">'+esc(nome)+' <span style="color:var(--cyan);">#'+String(r.numVisual||0).padStart(3,'0')+'</span></div>'+ 
         (subnome?'<div style="font-size:11px;color:#00c896;font-weight:800;">'+esc(subnome)+'</div>':'')+
-        '<div class="etq-robo-det">'+esc(r.modelo||'Sem modelo')+(r.sn?' · SN '+esc(r.sn):'')+statusTxt+'</div></div>'+ 
+        '<div class="etq-robo-det">'+esc(descricaoEquipamento(r)||'Sem modelo')+(r.sn?' · SN '+esc(r.sn):'')+statusTxt+'</div></div>'+ 
         '<div onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:4px;">'+
           '<button '+(locked?'disabled':'')+' onclick="setEtqCopias(\''+r.id+'\','+(copias-1)+')" style="width:27px;height:27px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-weight:900;">−</button>'+ 
           '<span style="min-width:20px;text-align:center;font-weight:900;color:var(--cyan);">'+copias+'</span>'+ 

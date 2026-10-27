@@ -14,7 +14,7 @@ function abrirWhatsAppDireto(clienteId){
     html+=robos.map(function(r){
       var num='#'+String(r.numVisual).padStart(3,'0');
       var temDiag=!!r.diagnostico;
-      return'<button class="btn'+(temDiag?' btn-cyan':'')+'" style="width:100%;justify-content:flex-start;margin-bottom:6px;padding:10px 12px;'+(temDiag?'':'opacity:.6;')+'" onclick="closeModal();abrirWhatsApp(\''+r.id+'\')">'+num+' · '+esc(r.modelo||'—')+(temDiag?' ✅':' (sem diagnóstico)')+'</button>';
+      return'<button class="btn'+(temDiag?' btn-cyan':'')+'" style="width:100%;justify-content:flex-start;margin-bottom:6px;padding:10px 12px;'+(temDiag?'':'opacity:.6;')+'" onclick="closeModal();abrirWhatsApp(\''+r.id+'\')">'+num+' · '+esc(descricaoEquipamento(r)||'—')+(temDiag?' ✅':' (sem diagnóstico)')+'</button>';
     }).join('');
   }
   html+='<div class="modal-actions"><button class="btn btn-close" onclick="closeModal()">Fechar</button></div>';
@@ -40,8 +40,8 @@ function gerarOSSelecionadosWA(cId){
     var nomeCliente=c.nome;
     if(c.tipo==='vc'&&r.nomeClienteFinal)nomeCliente=r.nomeClienteFinal;
     var msg=L+'\n         📋 SERVIÇOS\n'+L+'\n';
-    if(c.tipo==='vc'&&r.nomeClienteFinal)msg+='Robô: '+num+' — '+esc(r.modelo||'—')+'\nVendedor: '+c.nome+'\nCliente: '+r.nomeClienteFinal+'\n'+l+'\n';
-    else msg+='Robô: '+num+' — '+esc(r.modelo||'—')+'\nCliente: '+nomeCliente+'\n'+l+'\n';
+    if(c.tipo==='vc'&&r.nomeClienteFinal)msg+=textoEquipamento('Robô: ',r)+num+' — '+esc(descricaoEquipamento(r)||'—')+'\nVendedor: '+c.nome+'\nCliente: '+r.nomeClienteFinal+'\n'+l+'\n';
+    else msg+=textoEquipamento('Robô: ',r)+num+' — '+esc(descricaoEquipamento(r)||'—')+'\nCliente: '+nomeCliente+'\n'+l+'\n';
     if(d.abertura>0){var na='Abertura/Diagnóst.';var va=fmtVal(d.abertura);var pa='';for(var i=0;i<Math.max(1,28-na.length-va.length);i++)pa+='.';msg+=na+pa+va+'\n';}
     if(d.itens&&d.itens.length)d.itens.forEach(function(it){var n=it.nome.length>18?it.nome.substring(0,18)+'..':it.nome;var v=fmtVal(it.preco);var p='';for(var i=0;i<Math.max(1,28-n.length-v.length);i++)p+='.';msg+=n+p+v+'\n';});
     if(d.avulso>0){var nav=(d.avulsoDesc||'Cobrança avulsa');nav=nav.length>18?nav.substring(0,18)+'..':nav;var vav=fmtVal(d.avulso);var pav='';for(var i=0;i<Math.max(1,28-nav.length-vav.length);i++)pav+='.';msg+=nav+pav+vav+'\n';}
@@ -74,7 +74,7 @@ function enviarAtrasoDirecto(roboId){
   var r=DB.robos.find(function(x){return x.id===roboId;});if(!r)return;
   var c=DB.clientes.find(function(x){return x.id===r.clienteId;});if(!c)return;
   var num=r.numOS||('#'+String(r.numVisual).padStart(3,'0'));
-  var msg=atendimentoSaudacao(c,'🙏')+(atendimentoEhVC(r,c)?'Vim pedir desculpas pelo atraso no retorno sobre o robô do seu cliente *'+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(r.modelo||'—')+'*).':'Vim pedir desculpas pelo atraso no retorno sobre seu robô *'+num+' — '+esc(r.modelo||'—')+'*.')+'\n\nEstamos trabalhando para resolver o mais breve possível e logo teremos novidades!\n\n_\n*MoLeDo ElEtRoTeCh*\nReparo é nossa linguagem · Tecnologia é nossa paixão_';
+  var msg=atendimentoSaudacao(c,'🙏')+(atendimentoEhVC(r,c)?textoEquipamento('Vim pedir desculpas pelo atraso no retorno sobre o robô do seu cliente *',r)+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(descricaoEquipamento(r)||'—')+'*).':textoEquipamento('Vim pedir desculpas pelo atraso no retorno sobre seu robô *',r)+num+' — '+esc(descricaoEquipamento(r)||'—')+'*.')+'\n\nEstamos trabalhando para resolver o mais breve possível e logo teremos novidades!\n\n_\n*MoLeDo ElEtRoTeCh*\nReparo é nossa linguagem · Tecnologia é nossa paixão_';
   var wa=c.whatsapp.replace(/\D/g,'');
   if(wa.length===11)wa='55'+wa;
   window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(msg),'_blank');
@@ -97,7 +97,7 @@ function enviarLembreteRetirada(roboId){
   if(wa.length>=10&&!wa.startsWith('55'))wa='55'+wa;
   var nome=c.nome||'';
   var msg='Oi, '+nome+'! Tudo bem? 😊\n\n'+
-    (atendimentoEhVC(r,c)?'Passando pra lembrar que o robô do seu cliente *'+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+(r.modelo||'')+'*) já está prontinho e ainda está aqui com a gente! 🤖✅\n\n':'Passando pra lembrar que seu robô *'+num+' — '+(r.modelo||'')+'* já está prontinho e ainda está aqui com a gente! 🤖✅\n\n')+
+    (atendimentoEhVC(r,c)?textoEquipamento('Passando pra lembrar que o robô do seu cliente *',r)+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+(descricaoEquipamento(r)||'')+'*) já está prontinho e ainda está aqui com a gente! 🤖✅\n\n':textoEquipamento('Passando pra lembrar que seu robô *',r)+num+' — '+(descricaoEquipamento(r)||'')+'* já está prontinho e ainda está aqui com a gente! 🤖✅\n\n')+
     'Vamos acertar o pagamento e agendar a retirada (ou o envio)? 📦\n\n'+
     'Qualquer dúvida estou à disposição! 🙏\n\n'+
     '_*MoLeDo ElEtRoTeCh*\nReparo é nossa linguagem · Tecnologia é nossa paixão_';
@@ -129,9 +129,9 @@ function abrirWhatsApp(roboId){
   waMensagens={
     diagnostico:diagPronto?gerarMsgDiag(r,c):'',
     cartao:diagPronto?gerarMsgCartao(r):'',
-    pronto:atendimentoSaudacao(c,'😊')+(atendimentoEhVC(r,c)?'O robô do seu cliente *'+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(r.modelo||'—')+'*) está pronto para retirada! 🤖✅\n\n':'Seu robô *'+num+' — '+esc(r.modelo||'—')+'* está pronto para retirada! 🤖✅\n\n')+'Fique à vontade para combinar a retirada quando puder!\n\n_\n*MoLeDo ElEtRoTeCh*\nReparo é nossa linguagem · Tecnologia é nossa paixão_',
-    atraso:atendimentoSaudacao(c,'🙏')+(atendimentoEhVC(r,c)?'Vim pedir desculpas pelo atraso no retorno sobre o robô do seu cliente *'+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(r.modelo||'—')+'*).':'Vim pedir desculpas pelo atraso no retorno sobre seu robô *'+num+' — '+esc(r.modelo||'—')+'*.')+'\n\nEstamos trabalhando para resolver o mais breve possível e logo teremos novidades!\n\n_\n*MoLeDo ElEtRoTeCh*\nReparo é nossa linguagem · Tecnologia é nossa paixão_',
-    outro:atendimentoSaudacao(c,'👋')+(atendimentoEhVC(r,c)?'Sobre o robô do seu cliente *'+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(r.modelo||'—')+'*):\n\n':'')+'[Digite sua mensagem aqui]\n\n_\n*MoLeDo ElEtRoTeCh*\nReparo é nossa linguagem · Tecnologia é nossa paixão_'
+    pronto:atendimentoSaudacao(c,'😊')+(atendimentoEhVC(r,c)?textoEquipamento('O robô do seu cliente *',r)+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(descricaoEquipamento(r)||'—')+'*) está pronto para retirada! 🤖✅\n\n':textoEquipamento('Seu robô *',r)+num+' — '+esc(descricaoEquipamento(r)||'—')+'* está pronto para retirada! 🤖✅\n\n')+'Fique à vontade para combinar a retirada quando puder!\n\n_\n*MoLeDo ElEtRoTeCh*\nReparo é nossa linguagem · Tecnologia é nossa paixão_',
+    atraso:atendimentoSaudacao(c,'🙏')+(atendimentoEhVC(r,c)?textoEquipamento('Vim pedir desculpas pelo atraso no retorno sobre o robô do seu cliente *',r)+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(descricaoEquipamento(r)||'—')+'*).':textoEquipamento('Vim pedir desculpas pelo atraso no retorno sobre seu robô *',r)+num+' — '+esc(descricaoEquipamento(r)||'—')+'*.')+'\n\nEstamos trabalhando para resolver o mais breve possível e logo teremos novidades!\n\n_\n*MoLeDo ElEtRoTeCh*\nReparo é nossa linguagem · Tecnologia é nossa paixão_',
+    outro:atendimentoSaudacao(c,'👋')+(atendimentoEhVC(r,c)?textoEquipamento('Sobre o robô do seu cliente *',r)+atendimentoClienteFinal(r,c)+'* (*'+num+' — '+esc(descricaoEquipamento(r)||'—')+'*):\n\n':'')+'[Digite sua mensagem aqui]\n\n_\n*MoLeDo ElEtRoTeCh*\nReparo é nossa linguagem · Tecnologia é nossa paixão_'
   };
   var histHtml='';
   if(r.mensagens.length)histHtml='<div class="wa-hist"><div class="wa-hist-title">📋 Histórico</div>'+r.mensagens.slice().reverse().map(function(m){return'<div class="wa-hist-item">'+fmtData(m.data)+' — '+(WA_LABELS[m.tipo]||m.tipo)+'</div>';}).join('')+'</div>';
@@ -153,7 +153,7 @@ function abrirWhatsApp(roboId){
     :(waMensagens[waTipoAtual]||'');
 
   openModal('<div class="modal-title">💬 WhatsApp — '+esc(c.nome)+'</div>'+
-    '<div style="font-size:12px;color:var(--text3);margin-bottom:10px;">📱 '+esc(c.whatsapp)+' · Robô '+num+'</div>'+
+    '<div style="font-size:12px;color:var(--text3);margin-bottom:10px;">📱 '+esc(c.whatsapp)+textoEquipamento(' · Robô ',r)+num+'</div>'+
     (!diagPronto&&waTipoAtual==='diagnostico'?'<div style="background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.3);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--yellow);margin-bottom:10px;cursor:pointer;" onclick="closeModal();abrirDiagnostico(\''+roboId+'\')">⚠️ Diagnóstico não preenchido — <b>Toque aqui para fazer o diagnóstico</b></div>':'')+
     histHtml+
     '<div class="form-group"><label class="form-label">Tipo de mensagem</label><div class="wa-tipos">'+tiposBtns+'</div></div>'+

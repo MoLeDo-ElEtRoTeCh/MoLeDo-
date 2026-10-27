@@ -58,12 +58,12 @@ function _executarBuscaAgora(val){
     var c=DB.clientes.find(function(x){return x.id===r.clienteId;});
     var num='#'+String(r.numVisual).padStart(3,'0');
     var numOS=r.numOS||'';
-    if((r.modelo&&r.modelo.toLowerCase().indexOf(qStr)!==-1)||(r.sn&&r.sn.toLowerCase().indexOf(qStr)!==-1)||num.indexOf(qStr)!==-1||numOS.toLowerCase().indexOf(qStr)!==-1){
+    if((descricaoEquipamento(r)&&descricaoEquipamento(r).toLowerCase().indexOf(qStr)!==-1)||(r.sn&&r.sn.toLowerCase().indexOf(qStr)!==-1)||num.indexOf(qStr)!==-1||numOS.toLowerCase().indexOf(qStr)!==-1){
       var statusCor=r.status==='garantia'?'#ce93d8':r.status==='reparo'?'var(--cyan)':'var(--text3)';
       html+='<div onclick="toggleBusca();document.getElementById(\'busca-input\').value=\'\';openFichaRobo(\''+r.id+'\')" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">'+
         '<span style="font-size:18px;">🤖</span>'+
         '<div style="flex:1;">'+
-          '<div style="font-size:14px;font-weight:700;color:'+statusCor+';">'+num+' · '+esc(r.modelo||'—')+'</div>'+
+          '<div style="font-size:14px;font-weight:700;color:'+statusCor+';">'+num+' · '+esc(descricaoEquipamento(r)||'—')+'</div>'+
           '<div style="font-size:12px;color:var(--text3);">'+(c?esc(c.nome):'')+' · '+esc(r.sn||'—')+(numOS?' · '+numOS:'')+'</div>'+
         '</div>'+
         '<span style="font-size:10px;color:var(--text3);">'+esc(r.status)+'</span>'+

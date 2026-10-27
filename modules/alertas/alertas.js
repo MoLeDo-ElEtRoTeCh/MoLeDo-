@@ -28,7 +28,7 @@ function renderAlertas(){
         '<div class="cliente-label">'+(c?esc(c.nome.toUpperCase()):'?')+'</div>'+
         '<div style="display:flex;justify-content:space-between;align-items:center;">'+
           '<div><div class="robot-num" style="color:#c77dff;">'+num+'</div>'+
-          '<div class="robot-model">'+esc(r.modelo||'—')+'</div>'+
+          '<div class="robot-model">'+esc(descricaoEquipamento(r)||'—')+'</div>'+
           '<div style="font-size:11px;color:'+(atrasouPeca?'#ff4444':'#c77dff')+';">'+
           (atrasouPeca?'⚠️ Peça atrasada!':'📅 Prev: '+dprev)+'</div></div>'+
           '<div style="text-align:right;"><div style="font-size:28px;font-weight:700;color:'+(atrasouPeca?'#ff4444':'#c77dff')+';">'+Math.abs(diasAg)+'</div>'+
@@ -46,7 +46,7 @@ function renderAlertas(){
       return'<div class="card" style="border-color:#ff6d00;">'+
         '<div class="cliente-label">'+(c?esc(c.nome.toUpperCase()):'?')+'</div>'+
         '<div style="display:flex;justify-content:space-between;align-items:center;">'+
-          '<div><div class="robot-num" style="color:#ff6d00;">'+num+'</div><div class="robot-model">'+esc(r.modelo||'—')+'</div></div>'+
+          '<div><div class="robot-num" style="color:#ff6d00;">'+num+'</div><div class="robot-model">'+esc(descricaoEquipamento(r)||'—')+'</div></div>'+
           '<div style="text-align:right;"><div class="days-big" style="color:#ff6d00;">'+dias+'</div><div class="days-label">dias</div></div>'+
         '</div>'+
         '<div class="robot-actions">'+

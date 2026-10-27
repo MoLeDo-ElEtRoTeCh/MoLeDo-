@@ -2,7 +2,8 @@ function publicarFichaCancelada(r,c){
   try{
     var dadosPub={
       numOS:r.numOS||('#'+String(r.numVisual).padStart(3,'0')),
-      modelo:r.modelo||'',
+      modelo:descricaoEquipamento(r)||'',
+          tipoEquipamento:r.tipoEquipamento||'robo',nomeTipoEquipamento:r.nomeTipoEquipamento||'',
       voltagem:r.voltagem||'',
       dataEntrada:r.dataEntrada||'',
       diagnostico:r.diagnostico||null,
@@ -36,7 +37,8 @@ function republicarFichaPublica(roboId){
         var db2=fs.getFirestore(apps[0]);
         var dadosPub={
           numOS:r.numOS||('#'+String(r.numVisual).padStart(3,'0')),
-          modelo:r.modelo||'',
+          modelo:descricaoEquipamento(r)||'',
+          tipoEquipamento:r.tipoEquipamento||'robo',nomeTipoEquipamento:r.nomeTipoEquipamento||'',
           voltagem:r.voltagem||'',
           dataEntrada:r.dataEntrada||'',
           dataEntrega:r.dataEntrega||'',

@@ -26,13 +26,13 @@ function updateAlertBanner(){
     var c=DB.clientes.find(function(x){return x.id===r.clienteId;});
     var num='#'+String(r.numVisual).padStart(3,'0');
     var dias=diasDesde(r.dataEntrada);
-    parts.push('<span style="color:#ff6d00;">🔥 '+num+(c?' · '+c.nome:'')+(r.modelo?' · '+r.modelo:'')+' — '+dias+' dias</span>');
+    parts.push('<span style="color:#ff6d00;">🔥 '+num+(c?' · '+c.nome:'')+(descricaoEquipamento(r)?' · '+descricaoEquipamento(r):'')+' — '+dias+' dias</span>');
   });
   proximoAtraso.forEach(function(r){
     var c=DB.clientes.find(function(x){return x.id===r.clienteId;});
     var num='#'+String(r.numVisual).padStart(3,'0');
     var dias=diasDesde(r.dataEntrada);
-    parts.push('<span style="color:#ff4444;">⚠️ '+num+(c?' · '+c.nome:'')+(r.modelo?' · '+r.modelo:'')+' — '+dias+' dias</span>');
+    parts.push('<span style="color:#ff4444;">⚠️ '+num+(c?' · '+c.nome:'')+(descricaoEquipamento(r)?' · '+descricaoEquipamento(r):'')+' — '+dias+' dias</span>');
   });
   agPeca.forEach(function(r){
     var c=DB.clientes.find(function(x){return x.id===r.clienteId;});
@@ -41,12 +41,12 @@ function updateAlertBanner(){
     var diasFalta=0;var atrasou=false;
     if(ap&&ap.dataPrevista){var dp=new Date(ap.dataPrevista+'T00:00:00');diasFalta=Math.ceil((dp-hoje)/(1000*60*60*24));atrasou=diasFalta<0;}
     var info=atrasou?'peça atrasada '+Math.abs(diasFalta)+'d':'falta '+Math.abs(diasFalta)+'d';
-    parts.push('<span style="color:#c77dff;">📦 '+num+(c?' · '+c.nome:'')+(r.modelo?' · '+r.modelo:'')+' — '+info+'</span>');
+    parts.push('<span style="color:#c77dff;">📦 '+num+(c?' · '+c.nome:'')+(descricaoEquipamento(r)?' · '+descricaoEquipamento(r):'')+' — '+info+'</span>');
   });
   aguardRet.forEach(function(r){
     var c=DB.clientes.find(function(x){return x.id===r.clienteId;});
     var num='#'+String(r.numVisual).padStart(3,'0');
-    parts.push('<span style="color:#00c896;">📦 '+num+(c?' · '+c.nome:'')+(r.modelo?' · '+r.modelo:'')+' — aguardando retirada</span>');
+    parts.push('<span style="color:#00c896;">📦 '+num+(c?' · '+c.nome:'')+(descricaoEquipamento(r)?' · '+descricaoEquipamento(r):'')+' — aguardando retirada</span>');
   });
   garVencendo.forEach(function(r){
     var c=DB.clientes.find(function(x){return x.id===r.clienteId;});

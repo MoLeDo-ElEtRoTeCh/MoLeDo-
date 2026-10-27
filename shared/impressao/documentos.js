@@ -8,12 +8,12 @@ function gerarApresentacao(roboId){
   var qrInstaUrl='https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=6&data='+encodeURIComponent(instaUrl);
   var logoUrl='https://moledo-eletrotech.github.io/MoLeDo-/logo.png';
   var nome=c.nome.split(' ')[0];
-  var modelo=r.modelo||'Robô Aspirador';
+  var modelo=descricaoEquipamento(r)||textoEquipamento('Robô Aspirador',r);
   var dias=r.dataEntrada?Math.floor((new Date()-new Date(r.dataEntrada+'T00:00:00'))/(1000*60*60*24)):0;
   var atrasado=dias>30;
   var isSoPlaca=!!(r.bancada&&r.bancada.modo==='placa');
-  var equipPalavra=isSoPlaca?'Sua placa':'Seu robô';
-  var equipPalavraVC=isSoPlaca?'sua placa':'o seu robô';
+  var equipPalavra=isSoPlaca?'Sua placa':textoEquipamento('Seu robô',r);
+  var equipPalavraVC=isSoPlaca?'sua placa':textoEquipamento('o seu robô',r);
   var wa=(c.whatsapp||'').replace(/\D/g,'');
   if(wa.length===11)wa='55'+wa;
 
@@ -78,12 +78,12 @@ function gerarApresentacao(roboId){
       +'<div class="infos">'
         +'<div class="info-txt">'
           +'<div class="info-linha">🔍 Escaneie o QR Code ao lado para conferir a <b>ficha técnica completa</b> e sua <b>garantia de 90 dias</b>.</div>'
-          +'<div class="info-linha">📌 Os QR codes de garantia estão colados na <b>caixa</b>, na <b>base</b> e no <b>robô</b> — quando precisar, é só ler!</div>'
+          +textoEquipamento('<div class="info-linha">📌 Os QR codes de garantia estão colados na <b>caixa</b>, na <b>base</b> e no <b>robô</b> — quando precisar, é só ler!</div>',r)
           +'<div class="info-linha">✅ Qualquer dúvida, entre em contato pelo <b>WhatsApp</b> ou <b>Instagram</b> — estamos sempre à disposição!</div>'
         +'</div>'
         +'<div class="qr-ficha">'
           +'<img src="'+qrRoboUrl+'">'
-          +'<div class="qr-ficha-label">📋 Ficha do Robô<br>& Garantia</div>'
+          +textoEquipamento('<div class="qr-ficha-label">📋 Ficha do Robô<br>& Garantia</div>',r)
         +'</div>'
       +'</div>'
     +'</div>'
