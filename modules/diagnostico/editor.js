@@ -48,7 +48,8 @@ function renderDiagContent(r){
     '</div>'+
     '</div>';
   var botoesHtml='<div style="display:flex;gap:8px;margin-top:8px;margin-bottom:20px;">'+
-    '<button class="btn btn-wa" style="flex:1;justify-content:center;" onclick="salvarDiagnosticoEEnviar()">📱 Salvar e Enviar WhatsApp</button></div>';
+    '<button type="button" class="btn btn-cyan" style="flex:1;justify-content:center;" onclick="salvarDiagnostico()">SALVAR</button>'+
+    '<button type="button" class="btn btn-wa" style="flex:1;justify-content:center;" onclick="salvarDiagnosticoEEnviar()">SALVAR E ENVIAR</button></div>';
   el.innerHTML=aberHtml+descHtml+itensHtml+descontoHtml+
     '<div class="diag-total-box" id="diag-total-box"></div>'+
     '<div class="section-title">Calculadora de Parcelas</div><div class="calc-box" id="diag-calc-box"></div>'+

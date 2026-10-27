@@ -20,10 +20,14 @@
 <link rel="stylesheet" href="css/etiquetas.css">
 <link rel="stylesheet" href="css/print.css">
 <link rel="stylesheet" href="css/notificacoes.css">
+<style id="access-gate-style">
+html:not([data-access-validado="sim"]) body > :not(#login-overlay):not(#qr-escolha-overlay):not(#pub-ficha){display:none!important;}
+</style>
 </head>
 <body>
+<script src="shared/auth/acesso.js"></script>
 <div id="app-header">
-  <div style="position:absolute;top:8px;right:10px;z-index:5;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;color:#00b8d9;background:rgba(0,184,217,.08);border:1px solid rgba(0,184,217,.28);border-radius:7px;padding:3px 7px;letter-spacing:.4px;">TSIMP v2.10</div>
+  <div style="position:absolute;top:8px;right:10px;z-index:5;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;color:#00b8d9;background:rgba(0,184,217,.08);border:1px solid rgba(0,184,217,.28);border-radius:7px;padding:3px 7px;letter-spacing:.4px;">Versão 2.11</div>
   <img src="https://moledo-eletrotech.github.io/MoLeDo-/logo.png" style="max-height:115px;width:auto;display:block;margin:0 auto;" alt="MoLeDo ElEtRoTeCh">
 </div>
 <div id="alert-banner"><div id="alert-pulse"></div><div id="alert-ticker-wrap"><div id="alert-ticker"><span id="alert-text"></span></div></div></div>
@@ -297,27 +301,7 @@ const DOC_ID='dados';
 const COL='moledo';
 
 // Login overlay
-function mostrarLogin(){
-  if(document.getElementById('login-overlay'))return;
-  var el=document.createElement('div');
-  el.id='login-overlay';
-  el.style.cssText='position:fixed;inset:0;background:#0a0c10;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;';
-  el.innerHTML=`
-    <div style="text-align:center;margin-bottom:32px;">
-      <img src="https://moledo-eletrotech.github.io/MoLeDo-/logo.png" style="width:100%;max-width:380px;display:block;margin:0 auto;" alt="MoLeDo ElEtRoTeCh">
-      <div style="font-family:\'Rajdhani\',sans-serif;font-size:19px;font-weight:600;color:#00b8d9;letter-spacing:1.5px;margin-bottom:4px;text-align:center;">⚡ Reparo é nossa linguagem</div>
-      <div style="font-family:\'Rajdhani\',sans-serif;font-size:19px;font-weight:600;color:#00b8d9;letter-spacing:1.5px;margin-bottom:6px;text-align:center;">Tecnologia é nossa paixão ⚡</div>
-      <div style="font-size:11px;color:#334466;letter-spacing:2px;text-transform:uppercase;text-align:center;">Assistência Técnica · Robôs Aspiradores</div>
-    </div>
-    <div style="background:#111520;border:1px solid #1e2d45;border-radius:16px;padding:24px;width:100%;max-width:340px;">
-      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e5ff;margin-bottom:20px;">🔐 Acesso Restrito</div>
-      <div style="margin-bottom:12px;"><input id="login-email" type="email" placeholder="E-mail" style="width:100%;background:#0e1118;border:1px solid #1e2d45;border-radius:8px;padding:12px;color:#e0f0ff;font-family:\'Rajdhani\',sans-serif;font-size:14px;outline:none;"></div>
-      <div style="margin-bottom:16px;"><input id="login-senha" type="password" placeholder="Senha" style="width:100%;background:#0e1118;border:1px solid #1e2d45;border-radius:8px;padding:12px;color:#e0f0ff;font-family:\'Rajdhani\',sans-serif;font-size:14px;outline:none;"></div>
-      <div id="login-erro" style="color:#ff1744;font-size:12px;margin-bottom:10px;display:none;"></div>
-      <button onclick="window._fazerLogin()" style="width:100%;background:linear-gradient(135deg,#007ea8,#005f7f);border:1px solid #007ea8;color:#fff;padding:13px;border-radius:10px;font-family:\'Rajdhani\',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:1px;">ENTRAR</button>
-    </div>`;
-  document.body.appendChild(el);
-}
+function mostrarLogin(){window._mostrarLoginSeguro();}
 
 window._fazerLogin=async function(){
   var email=document.getElementById('login-email').value.trim();
@@ -327,7 +311,8 @@ window._fazerLogin=async function(){
   try{
     await signInWithEmailAndPassword(auth,email,senha);
   }catch(e){
-    erro.textContent='E-mail ou senha incorretos.';
+    window._bloquearAcesso();
+    erro.textContent=(e.code==='auth/network-request-failed')?'Sem conexão. Não foi possível validar o acesso.':'E-mail ou senha incorretos.';
     erro.style.display='block';
   }
 };
@@ -577,20 +562,57 @@ function addLogoutBtn(){
   }
 }
 
-onAuthStateChanged(auth,function(user){
-  if(user){
-    // Logado — técnico
-    var overlay=document.getElementById('login-overlay');
-    if(overlay)overlay.remove();
-    var qrOverlay=document.getElementById('qr-escolha-overlay');
-    if(qrOverlay)qrOverlay.remove();
-    window._fbReady=true;
+let acessoSeq=0;
+let acessoExpiracao=null;
+let interfacePreparada=false;
+async function validarAcesso(user){
+  const seq=++acessoSeq;
+  clearTimeout(acessoExpiracao);
+  window._bloquearAcesso('Validando acesso...');
+  if(!user||!navigator.onLine){
+    window._bloquearAcesso(user?'Sem conexão. Não foi possível validar o acesso.':'Faça login para acessar.');
+    return false;
+  }
+  let limite;
+  try{
+    const token=await Promise.race([
+      user.getIdToken(true),
+      new Promise((_,reject)=>{limite=setTimeout(()=>reject(new Error('VALIDACAO_TIMEOUT')),15000);})
+    ]);
+    if(!token)throw new Error('SESSAO_NAO_VALIDADA');
+    if(seq!==acessoSeq||!navigator.onLine||auth.currentUser!==user)return false;
+    document.documentElement.setAttribute('data-access-validado','sim');
+    acessoExpiracao=setTimeout(()=>window._validarAcessoAtual(),50*60*1000);
+    return true;
+  }catch(e){
+    if(seq===acessoSeq)window._bloquearAcesso('Sem conexão. Não foi possível validar o acesso.');
+    return false;
+  }finally{clearTimeout(limite);}
+}
+function liberarAcessoValidado(){
+  var overlay=document.getElementById('login-overlay');if(overlay)overlay.remove();
+  var qrOverlay=document.getElementById('qr-escolha-overlay');if(qrOverlay)qrOverlay.remove();
+  window._fbReady=true;
+  if(!interfacePreparada){
+    interfacePreparada=true;
     addLogoutBtn();
     criarBotaoFlutuante();
     verificarBackupSemanal();
     loadFromFirebase();
+  }
+}
+window._validarAcessoAtual=async function(){
+  if(await validarAcesso(auth.currentUser))liberarAcessoValidado();
+};
+onAuthStateChanged(auth,async function(user){
+  if(user){
+    // A sessao em cache so libera a interface depois da validacao online.
+    if(!await validarAcesso(user))return;
+    liberarAcessoValidado();
   } else {
     // Não logado
+    ++acessoSeq;clearTimeout(acessoExpiracao);interfacePreparada=false;
+    window._bloquearAcesso('Faça login para acessar.');
     window._fbReady=false;
     if(window.zebraPararPolling)window.zebraPararPolling();
     if(window.zebraPararLoteTimer)window.zebraPararLoteTimer();
@@ -603,7 +625,7 @@ onAuthStateChanged(auth,function(user){
       mostrarLogin();
     }
   }
-});
+},function(){++acessoSeq;clearTimeout(acessoExpiracao);window._bloquearAcesso('Sem conexão. Não foi possível validar o acesso.');});
 
 function mostrarEscolhaQR(roboId){
   window._qrRoboIdPub=roboId;
