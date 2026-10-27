@@ -1,0 +1,12 @@
+.config-cat-title{font-size:11px;font-weight:700;color:var(--cyan2);letter-spacing:1px;text-transform:uppercase;margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.config-item-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;}
+.config-item-card.inativo{opacity:.5;}
+.config-item-header{display:flex;align-items:center;justify-content:space-between;}
+.config-item-nome{font-size:13px;color:var(--text);font-weight:700;}
+.config-item-cat{font-size:11px;color:var(--text3);margin-top:2px;}
+.config-item-actions{display:flex;gap:5px;flex-shrink:0;}
+.config-btn{padding:5px 9px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;}
+.config-btn.edit{border-color:rgba(0,229,255,.3);color:var(--cyan2);}
+.config-btn.del{border-color:rgba(255,23,68,.3);color:var(--red);}
+.config-btn.toggle{border-color:rgba(0,230,118,.3);color:var(--green);}
+.config-btn.toggle.off{border-color:rgba(255,255,255,.1);color:var(--text3);}

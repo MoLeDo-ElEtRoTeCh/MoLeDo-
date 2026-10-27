@@ -1,0 +1,7 @@
+@media print{
+  #etq-toolbar{display:none!important;}
+  #etq-body{overflow:visible!important;background:#fff!important;padding:0!important;}
+  body>*:not(#etq-overlay){display:none!important;}
+  #etq-overlay{position:static!important;background:#fff!important;}
+  @page{size:A4 portrait;margin:5mm;}
+}

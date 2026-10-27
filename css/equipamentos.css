@@ -1,0 +1,24 @@
+.robot-num{font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;color:var(--cyan);}
+.robot-sn{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);margin-top:1px;}
+.robot-model{font-size:14px;font-weight:700;color:#fff;margin-top:3px;}
+.robot-volt{font-size:11px;color:var(--yellow);font-weight:700;margin-top:2px;}
+.robot-defects{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0;}
+.defect-chip{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--cyan2);}
+.robot-meta{font-size:12px;color:var(--text3);margin-bottom:8px;line-height:1.7;}
+.robot-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.cliente-label{font-size:11px;color:var(--text3);font-weight:700;letter-spacing:.5px;margin-bottom:2px;}
+.wa-last{font-size:11px;color:#25d366;margin-bottom:6px;padding:5px 8px;background:rgba(37,211,102,.06);border-left:3px solid rgba(37,211,102,.35);border-radius:0 6px 6px 0;}
+.diag-badge{font-size:11px;color:var(--yellow);margin-bottom:6px;padding:5px 8px;background:rgba(255,214,0,.06);border-left:3px solid rgba(255,214,0,.35);border-radius:0 6px 6px 0;font-weight:700;}
+.status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:6px;}
+.status-verde{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.4);color:var(--green);}
+.status-amarelo{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.4);color:var(--yellow);}
+.status-vermelho{background:rgba(255,23,68,.1);border:1px solid rgba(255,23,68,.4);color:var(--red);}
+.status-critico{background:rgba(255,109,0,.15);border:1px solid rgba(255,109,0,.5);color:var(--orange);animation:blink .8s infinite;}
+.status-garantia{background:rgba(170,0,255,.1);border:1px solid rgba(170,0,255,.4);color:#ce93d8;}
+.status-retirada{background:rgba(0,200,150,.12);border:1px solid rgba(0,200,150,.45);color:#00c896;}
+.status-lixeira{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);color:var(--text3);}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.6;}}
+.days-big{font-family:'Share Tech Mono',monospace;font-size:28px;font-weight:700;line-height:1;}
+.days-label{font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;}
+.garantia-shield{font-size:28px;margin-bottom:4px;}
+.garantia-days{font-family:'Share Tech Mono',monospace;font-size:20px;color:var(--purple);font-weight:700;}

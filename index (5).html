@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MoLeDo ElEtRoTeCh</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230a0c10'/%3E%3C!-- corpo circular roomba --%3E%3Ccircle cx='96' cy='110' r='65' fill='%23111520' stroke='%2300e5ff' stroke-width='5'/%3E%3C!-- bump sensor frente --%3E%3Cpath d='M55 58 Q96 30 137 58' stroke='%2300e5ff' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C!-- anel interno --%3E%3Ccircle cx='96' cy='110' r='30' fill='none' stroke='rgba(0,229,255,0.3)' stroke-width='3'/%3E%3C!-- botão power --%3E%3Ccircle cx='96' cy='110' r='14' fill='%2300e5ff'/%3E%3Cpath d='M96 100 L96 108' stroke='%230a0c10' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='96' cy='113' r='3' fill='%230a0c10'/%3E%3C!-- sensores IR --%3E%3Ccircle cx='46' cy='110' r='6' fill='%2300e5ff' opacity='0.7'/%3E%3Ccircle cx='146' cy='110' r='6' fill='%2300e5ff' opacity='0.7'/%3E%3C!-- rodas --%3E%3Crect x='28' y='140' width='22' height='12' rx='5' fill='%23007ea8'/%3E%3Crect x='142' y='140' width='22' height='12' rx='5' fill='%23007ea8'/%3E%3C!-- escova lateral --%3E%3Cline x1='55' y1='158' x2='30' y2='180' stroke='%2300e5ff' stroke-width='4' opacity='0.7'/%3E%3Cline x1='46' y1='155' x2='22' y2='168' stroke='%2300e5ff' stroke-width='3' opacity='0.5'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230a0c10'/%3E%3Ccircle cx='96' cy='110' r='65' fill='%23111520' stroke='%2300e5ff' stroke-width='5'/%3E%3Cpath d='M55 58 Q96 30 137 58' stroke='%2300e5ff' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='96' cy='110' r='30' fill='none' stroke='rgba(0,229,255,0.3)' stroke-width='3'/%3E%3Ccircle cx='96' cy='110' r='14' fill='%2300e5ff'/%3E%3Ccircle cx='46' cy='110' r='6' fill='%2300e5ff' opacity='0.7'/%3E%3Ccircle cx='146' cy='110' r='6' fill='%2300e5ff' opacity='0.7'/%3E%3Crect x='28' y='140' width='22' height='12' rx='5' fill='%23007ea8'/%3E%3Crect x='142' y='140' width='22' height='12' rx='5' fill='%23007ea8'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/cards.css">
+<link rel="stylesheet" href="css/clientes.css">
+<link rel="stylesheet" href="css/equipamentos.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/fichas.css">
+<link rel="stylesheet" href="css/diagnostico.css">
+<link rel="stylesheet" href="css/configuracoes.css">
+<link rel="stylesheet" href="css/cancelamento.css">
+<link rel="stylesheet" href="css/etiquetas.css">
+<link rel="stylesheet" href="css/print.css">
+<link rel="stylesheet" href="css/notificacoes.css">
+</head>
+<body>
+<div id="app-header">
+  <div style="position:absolute;top:8px;right:10px;z-index:5;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;color:#00b8d9;background:rgba(0,184,217,.08);border:1px solid rgba(0,184,217,.28);border-radius:7px;padding:3px 7px;letter-spacing:.4px;">TSIMP v2.10</div>
+  <img src="https://moledo-eletrotech.github.io/MoLeDo-/logo.png" style="max-height:115px;width:auto;display:block;margin:0 auto;" alt="MoLeDo ElEtRoTeCh">
+</div>
+<div id="alert-banner"><div id="alert-pulse"></div><div id="alert-ticker-wrap"><div id="alert-ticker"><span id="alert-text"></span></div></div></div>
+<div id="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('clientes')">👤 Clientes</button>
+  <button class="tab-btn" onclick="switchTab('diagnostico')">💊 Diagnóst.<span class="tab-badge yellow" id="badge-diag" style="display:none"></span></button>
+  <button class="tab-btn" onclick="switchTab('fila')">🔧 Fila</button>
+  <button class="tab-btn" onclick="switchTab('garantia')">🛡️ Garantia</button>
+  <button class="tab-btn" onclick="switchTab('alertas')">🚨 Alertas<span class="tab-badge orange" id="badge-alertas" style="display:none"></span></button>
+  <button class="tab-btn" onclick="switchTab('etiqueta')">🏷️ Etiquetas</button>
+  <button class="tab-btn" onclick="switchTab('relatorio')">📊 Relatório</button>
+  <button class="tab-btn" onclick="switchTab('lixeira')">🗑️ Lixeira<span class="tab-badge gray" id="badge-lixeira" style="display:none"></span></button>
+</div>
+<div id="content">
+  <div id="tab-clientes" class="tab-pane active">
+    <div style="display:flex;gap:6px;margin-bottom:12px;">
+      <button onclick="setFiltroCliente('todos')" id="fc-todos" class="btn btn-cyan" style="flex:1;justify-content:center;font-size:12px;padding:8px;">👥 Todos</button>
+      <button onclick="setFiltroCliente('cf')" id="fc-cf" class="btn btn-close" style="flex:1;justify-content:center;font-size:12px;padding:8px;">👤 Clientes</button>
+      <button onclick="setFiltroCliente('vd')" id="fc-vd" class="btn btn-close" style="flex:1;justify-content:center;font-size:12px;padding:8px;">🏪 Vendedores</button>
+      <button onclick="setFiltroCliente('inativo')" id="fc-inativo" class="btn btn-close" style="flex:1;justify-content:center;font-size:12px;padding:8px;">💤 Inativos</button>
+    </div>
+    <div id="clientes-list"></div>
+  </div>
+  <div id="tab-checkin" class="tab-pane">
+    <div class="section-title">Novo Check-in</div>
+    <button class="btn btn-cyan" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="abrirIACadastro()">✨ Cadastro por IA</button>
+    <div class="card">
+      <div class="form-group"><label class="form-label">Tipo de Cliente</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button type="button" id="tipo-cf" onclick="setTipoCliente('cf')" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(0,229,255,.3);background:rgba(0,229,255,.15);color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">👤 Cliente Final</button>
+          <button type="button" id="tipo-vd" onclick="setTipoCliente('vd')" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🏪 Vendedor</button>
+          <button type="button" id="tipo-vc" onclick="setTipoCliente('vc')" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🤝 Vend+Cliente</button>
+        </div>
+      </div>
+      <div class="form-group" style="position:relative;">
+        <label class="form-label">Nome do Cliente</label>
+        <input id="ci-nome" class="form-input" type="text" placeholder="Ex: Luiz Ferreira" oninput="autocompleteCliente(this.value)" autocomplete="off">
+        <div id="ci-autocomplete" style="display:none;position:absolute;left:0;right:0;background:var(--bg2);border:1px solid var(--cyan3);border-radius:8px;z-index:999;max-height:180px;overflow-y:auto;"></div>
+      </div>
+      <div id="ci-nome-cliente-final-group" style="display:none;" class="form-group"><label class="form-label">Nome do Cliente Final</label><input id="ci-nome-cf" class="form-input" type="text" placeholder="Ex: Maria Silva"></div>
+      <div class="form-group">
+        <label class="form-label">WhatsApp</label>
+        <input id="ci-wa" class="form-input" type="tel" placeholder="Ex: 44991001106" oninput="autocompleteClienteWa(this.value)">
+      </div>
+      <div class="form-group"><label class="form-label">Data de Entrada</label><input id="ci-data" class="form-input" type="date"></div>
+      <div class="form-group"><label class="form-label">Quantidade de Robôs</label>
+        <div class="qty-selector"><div class="qty-btn" onclick="changeQty(-1)">−</div><div class="qty-val" id="ci-qty-val">1</div><div class="qty-btn" onclick="changeQty(1)">+</div></div>
+      </div>
+    </div>
+    <div id="ci-robots-container"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" onclick="salvarCheckin()">✅ Salvar Check-in</button>
+  </div>
+  <div id="tab-fila" class="tab-pane"><div id="fila-list"></div></div>
+  <div id="tab-alertas" class="tab-pane"><div id="alertas-list"></div></div>
+  <div id="tab-garantia" class="tab-pane"><div id="garantia-list"></div></div>
+  <div id="tab-lixeira" class="tab-pane"><div id="lixeira-list"></div></div>
+  <div id="tab-etiqueta" class="tab-pane"><div id="etiqueta-ui"></div></div>
+  <div id="tab-diagnostico" class="tab-pane"><div id="diagnostico-list"></div></div>
+  <div id="tab-relatorio" class="tab-pane"><div id="relatorio-list"></div></div>
+</div>
+<div id="ficha-overlay">
+  <div id="ficha-header">
+    <div class="back-nav" onclick="closeClienteDetalhe()">← Voltar</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div><div class="client-name" id="ficha-nome"></div><div class="client-wa" id="ficha-wa"></div></div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn" onclick="abrirCobrancaPix()" style="background:rgba(0,186,124,.15);border:1px solid rgba(0,186,124,.4);color:#00ba7c;padding:5px 10px;font-size:11px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-weight:700;cursor:pointer;">💠 PIX</button>
+        <button class="btn" onclick="abrirSeletorOS()" style="background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.35);color:var(--cyan);padding:5px 10px;font-size:11px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-weight:700;cursor:pointer;">📋 OS</button>
+        <button class="btn btn-edit" onclick="editarCliente()">✏️ Editar</button>
+      </div>
+    </div>
+  </div>
+  <div id="ficha-content"></div>
+</div>
+<div id="diag-overlay">
+  <div id="diag-header">
+    <div class="back-nav" onclick="fecharDiagnostico()" style="color:var(--yellow);">← Voltar</div>
+    <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--yellow);">💊 DIAGNÓSTICO</div>
+    <div id="diag-robo-info" style="font-size:12px;color:var(--text2);margin-top:2px;"></div>
+  </div>
+  <div id="diag-content"></div>
+</div>
+<div id="config-overlay">
+  <div id="config-header">
+    <div class="back-nav" onclick="fecharConfigDiag()" style="color:var(--cyan);">← Voltar</div>
+    <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--cyan);">⚙️ CONFIGURAÇÕES</div>
+  </div>
+  <div id="config-content"></div>
+</div>
+<div id="etq-overlay">
+  <div id="etq-toolbar">
+    <button class="etq-btn-back" onclick="fecharEtiqueta()">← Voltar</button>
+    <button class="etq-btn-print" onclick="window.print()">🖨️ Imprimir</button>
+    <span style="font-size:12px;color:#666;">ou Compartilhar → Imprimir</span>
+  </div>
+  <div id="etq-body"><div id="etq-folha"></div></div>
+</div>
+<div id="modal-overlay"><div class="modal" id="modal-box"></div></div>
+<!-- BUSCA GERAL -->
+<div id="busca-overlay" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.8);flex-direction:column;align-items:center;padding-top:60px;">
+  <div style="width:92%;max-width:500px;background:var(--bg2);border:1px solid var(--cyan3);border-radius:14px;overflow:hidden;">
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);">
+      <span style="font-size:18px;">🔍</span>
+      <input id="busca-input" type="text" placeholder="Buscar cliente, robô, modelo, SN..." oninput="executarBusca(this.value)" style="flex:1;background:none;border:none;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;outline:none;">
+      <button onclick="fecharOuLimparBusca()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;">✕</button>
+    </div>
+    <div id="busca-resultados" style="max-height:320px;overflow-y:auto;"></div>
+  </div>
+</div>
+<!-- SYNC TOAST CENTRAL -->
+<div id="sync-toast">
+  <div class="sync-box">
+    <div class="sync-orbit">
+      <div class="sync-orbit-inner">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:robot-spin 0.7s linear infinite;filter:drop-shadow(0 0 8px rgba(0,229,255,.8))">
+          <!-- corpo circular (Roomba) -->
+          <circle cx="18" cy="20" r="13" fill="#0e1520" stroke="#00e5ff" stroke-width="1.5"/>
+          <!-- bump sensor frente -->
+          <path d="M11 10 Q18 5 25 10" stroke="#00e5ff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <!-- painel top -->
+          <circle cx="18" cy="20" r="6" fill="none" stroke="rgba(0,229,255,.4)" stroke-width="1"/>
+          <!-- botão power -->
+          <circle cx="18" cy="20" r="2.5" fill="#00e5ff" opacity=".9"/>
+          <!-- sensor IR esquerdo -->
+          <circle cx="10" cy="20" r="1.2" fill="#00e5ff" opacity=".6"/>
+          <!-- sensor IR direito -->
+          <circle cx="26" cy="20" r="1.2" fill="#00e5ff" opacity=".6"/>
+          <!-- rodas -->
+          <rect x="7" y="24" width="4" height="2.5" rx="1" fill="#007ea8"/>
+          <rect x="25" y="24" width="4" height="2.5" rx="1" fill="#007ea8"/>
+          <!-- escova lateral -->
+          <line x1="13" y1="29" x2="9" y2="33" stroke="#00e5ff" stroke-width="1" opacity=".7"/>
+          <line x1="11" y1="29" x2="7" y2="31" stroke="#00e5ff" stroke-width="1" opacity=".5"/>
+        </svg>
+      </div>
+    </div>
+    <div class="sync-label" id="sync-label">Sincronizando</div>
+    <div class="sync-sub" id="sync-sub">aguarde um instante...</div>
+    <div class="sync-dots" style="margin-top:10px"><span></span><span></span><span></span></div>
+  </div>
+</div>
+<script src="shared/utils/datas.js"></script>
+<script src="shared/utils/moeda.js"></script>
+<script src="shared/utils/identificadores.js"></script>
+<script src="shared/utils/html.js"></script>
+<script src="shared/sn/normalizacao.js"></script>
+<script src="shared/sn/validacao.js"></script>
+<script src="modules/clientes/clientes.js"></script>
+<script src="modules/clientes/ficha-cliente.js"></script>
+<script src="modules/clientes/cadastro-cliente.js"></script>
+<script src="modules/clientes/autocomplete.js"></script>
+<script src="modules/clientes/inatividade.js"></script>
+<script src="modules/checkin/checkin.js"></script>
+<script src="modules/checkin/formulario.js"></script>
+<script src="modules/checkin/equipamentos.js"></script>
+<script src="modules/checkin/recebimento.js"></script>
+<script src="shared/ui/voltagem.js"></script>
+<script src="modules/equipamentos/ficha.js"></script>
+<script src="modules/equipamentos/card.js"></script>
+<script src="modules/equipamentos/timeline.js"></script>
+<script src="modules/equipamentos/edicao.js"></script>
+<script src="modules/equipamentos/notas.js"></script>
+<script src="modules/atendimento/etapas.js"></script>
+<script src="modules/atendimento/bancada.js"></script>
+<script src="modules/atendimento/entrega.js"></script>
+<script src="modules/atendimento/agendamento.js"></script>
+<script src="modules/atendimento/cancelamento.js"></script>
+<script src="modules/diagnostico/lista.js"></script>
+<script src="modules/diagnostico/editor.js"></script>
+<script src="modules/diagnostico/itens.js"></script>
+<script src="modules/diagnostico/configuracoes.js"></script>
+<script src="modules/checkin/configuracoes.js"></script>
+<script src="modules/fila/fila.js"></script>
+<script src="modules/garantia/garantia.js"></script>
+<script src="modules/garantia/retorno.js"></script>
+<script src="modules/alertas/alertas.js"></script>
+<script src="modules/alertas/ticker.js"></script>
+<script src="modules/alertas/aguardando-peca.js"></script>
+<script src="modules/lembretes/lembretes.js"></script>
+<script src="modules/lembretes/verificacao.js"></script>
+<script src="modules/financeiro/valores.js"></script>
+<script src="modules/financeiro/pagamentos.js"></script>
+<script src="modules/financeiro/cartoes.js"></script>
+<script src="modules/financeiro/pix.js"></script>
+<script src="modules/financeiro/resumo.js"></script>
+<script src="modules/ordens-servico/numeracao.js"></script>
+<script src="modules/ordens-servico/individual.js"></script>
+<script src="modules/ordens-servico/multipla.js"></script>
+<script src="modules/ordens-servico/cancelamento.js"></script>
+<script src="modules/ordens-servico/selecao.js"></script>
+<script src="modules/relatorios/relatorio.js"></script>
+<script src="modules/relatorios/financeiro.js"></script>
+<script src="modules/lixeira/lixeira.js"></script>
+<script src="modules/lixeira/arquivamento.js"></script>
+<script src="modules/lixeira/restauracao.js"></script>
+<script src="modules/lixeira/retencao.js"></script>
+<script src="modules/modo-tv/modo-tv.js"></script>
+<script src="modules/modo-tv/render.js"></script>
+<script src="modules/modo-tv/timers.js"></script>
+<script src="shared/whatsapp/mensagens.js"></script>
+<script src="shared/whatsapp/abertura.js"></script>
+<script src="shared/ia/texto.js"></script>
+<script src="shared/ia/cadastro.js"></script>
+<script src="shared/ia/diagnostico.js"></script>
+<script src="shared/ia/leitura-sn.js"></script>
+<script src="shared/sn/camera.js"></script>
+<script src="shared/sn/leitura-local.js"></script>
+<script src="shared/sn/confirmacao.js"></script>
+<script src="shared/sn/historico.js"></script>
+<script src="shared/impressao/documentos.js"></script>
+<script src="modules/etiquetas/envio.js"></script>
+<script src="modules/etiquetas/clientes.js"></script>
+<script src="shared/impressao/zebra/validacao.js"></script>
+<script src="shared/impressao/zebra/bitmap.js"></script>
+<script src="shared/impressao/zebra/armazenamento.js"></script>
+<script src="shared/impressao/zebra/transporte.js"></script>
+<script src="shared/impressao/zebra/lote.js"></script>
+<script src="shared/impressao/zebra/pendencia.js"></script>
+<script src="shared/impressao/zebra/estados.js"></script>
+<script src="shared/impressao/zebra/erros.js"></script>
+<script src="shared/impressao/zebra/recuperacao.js"></script>
+<script src="shared/impressao/zebra/ui.js"></script>
+<script src="shared/data/persistencia-local.js"></script>
+<script src="shared/backup/backup.js"></script>
+<script src="shared/ui/notificacoes.js"></script>
+<script src="shared/ui/modais.js"></script>
+<script src="shared/ui/busca.js"></script>
+<script src="app/navegacao.js"></script>
+<script src="app/cabecalho.js"></script>
+<script src="shared/firebase/fichas-publicas.js"></script>
+<script src="vendor/qrcode/qrcode.js"></script>
+<script src="shared/data/estado.js"></script>
+<script src="shared/data/defaults.js"></script>
+<script src="shared/data/estado-atendimento.js"></script>
+<script src="shared/impressao/zebra/template.js"></script>
+<script src="shared/data/estado-complementar.js"></script>
+<script src="shared/impressao/zebra/locks.js"></script>
+<script src="app/inicializacao.js"></script>
+
+<!-- FIREBASE -->
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
+import{getFirestore,doc,getDoc,setDoc}from'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
+import{getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged}from'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
+
+const firebaseConfig={
+  apiKey:"AIzaSyBft8GBl62cjjloFXPD6YGWQ1ZGAj3-974",
+  authDomain:"moledo-eletrotech.firebaseapp.com",
+  projectId:"moledo-eletrotech",
+  storageBucket:"moledo-eletrotech.firebasestorage.app",
+  messagingSenderId:"774943605099",
+  appId:"1:774943605099:web:cf48798e8aadfd90734c2e"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const auth=getAuth(app);
+
+// Ponte mínima para o fluxo Zebra. O token fica somente em memória e nunca é salvo.
+window._getPrintCurrentUid=function(){return auth.currentUser?auth.currentUser.uid:null;};
+window._getPrintAuthContext=async function(forceRefresh){
+  const user=auth.currentUser;
+  if(!user)throw Object.assign(new Error('LOGIN_NECESSARIO'),{code:'LOGIN_NECESSARIO'});
+  const uid=user.uid;
+  const token=await user.getIdToken(!!forceRefresh);
+  if(!auth.currentUser||auth.currentUser.uid!==uid)throw Object.assign(new Error('USUARIO_ALTERADO'),{code:'USUARIO_ALTERADO'});
+  return {uid:uid,token:token};
+};
+
+const DOC_ID='dados';
+const COL='moledo';
+
+// Login overlay
+function mostrarLogin(){
+  if(document.getElementById('login-overlay'))return;
+  var el=document.createElement('div');
+  el.id='login-overlay';
+  el.style.cssText='position:fixed;inset:0;background:#0a0c10;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;';
+  el.innerHTML=`
+    <div style="text-align:center;margin-bottom:32px;">
+      <img src="https://moledo-eletrotech.github.io/MoLeDo-/logo.png" style="width:100%;max-width:380px;display:block;margin:0 auto;" alt="MoLeDo ElEtRoTeCh">
+      <div style="font-family:\'Rajdhani\',sans-serif;font-size:19px;font-weight:600;color:#00b8d9;letter-spacing:1.5px;margin-bottom:4px;text-align:center;">⚡ Reparo é nossa linguagem</div>
+      <div style="font-family:\'Rajdhani\',sans-serif;font-size:19px;font-weight:600;color:#00b8d9;letter-spacing:1.5px;margin-bottom:6px;text-align:center;">Tecnologia é nossa paixão ⚡</div>
+      <div style="font-size:11px;color:#334466;letter-spacing:2px;text-transform:uppercase;text-align:center;">Assistência Técnica · Robôs Aspiradores</div>
+    </div>
+    <div style="background:#111520;border:1px solid #1e2d45;border-radius:16px;padding:24px;width:100%;max-width:340px;">
+      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e5ff;margin-bottom:20px;">🔐 Acesso Restrito</div>
+      <div style="margin-bottom:12px;"><input id="login-email" type="email" placeholder="E-mail" style="width:100%;background:#0e1118;border:1px solid #1e2d45;border-radius:8px;padding:12px;color:#e0f0ff;font-family:\'Rajdhani\',sans-serif;font-size:14px;outline:none;"></div>
+      <div style="margin-bottom:16px;"><input id="login-senha" type="password" placeholder="Senha" style="width:100%;background:#0e1118;border:1px solid #1e2d45;border-radius:8px;padding:12px;color:#e0f0ff;font-family:\'Rajdhani\',sans-serif;font-size:14px;outline:none;"></div>
+      <div id="login-erro" style="color:#ff1744;font-size:12px;margin-bottom:10px;display:none;"></div>
+      <button onclick="window._fazerLogin()" style="width:100%;background:linear-gradient(135deg,#007ea8,#005f7f);border:1px solid #007ea8;color:#fff;padding:13px;border-radius:10px;font-family:\'Rajdhani\',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:1px;">ENTRAR</button>
+    </div>`;
+  document.body.appendChild(el);
+}
+
+window._fazerLogin=async function(){
+  var email=document.getElementById('login-email').value.trim();
+  var senha=document.getElementById('login-senha').value;
+  var erro=document.getElementById('login-erro');
+  erro.style.display='none';
+  try{
+    await signInWithEmailAndPassword(auth,email,senha);
+  }catch(e){
+    erro.textContent='E-mail ou senha incorretos.';
+    erro.style.display='block';
+  }
+};
+
+async function syncToFirebase(){
+  showSyncToast('Salvando na nuvem','sincronizando dados...');
+  try{
+    await setDoc(doc(db,COL,DOC_ID),{dados:JSON.stringify(window.DB),updated:Date.now()});
+    hideSyncToast('☁️ Salvo na nuvem!');
+  }catch(e){console.log('sync error',e);hideSyncToast('⚠️ Erro ao salvar na nuvem');}
+}
+window.syncToFirebase=syncToFirebase;
+
+async function loadFromFirebase(){
+  showSyncToast('Carregando da nuvem','buscando seus dados...');
+  try{
+    var snap=await getDoc(doc(db,COL,DOC_ID));
+    if(snap.exists()){
+      var dados=JSON.parse(snap.data().dados);
+      window.DB=dados;
+      if(!window.DB.clientes)window.DB.clientes=[];
+      if(!window.DB.robos)window.DB.robos=[];
+      if(!window.DB.lixeira)window.DB.lixeira=[];
+      if(!window.DB.catalogo)window.DB.catalogo=[];
+      if(!window.DB.defeitosCI)window.DB.defeitosCI=[];
+      if(window.DB.taxas)Object.assign(window.TAXAS,window.DB.taxas);
+      window.DB.robos.forEach(function(r){if(!r.mensagens)r.mensagens=[];if(r.diagnostico===undefined)r.diagnostico=null;});
+      if((window.DB.versaoCatalogo||0)<2){window.DB.catalogo=window.CAT_PAD.map(function(x){return Object.assign({id:window.genId()},x);});window.DB.versaoCatalogo=2;}
+      // repopula defeitos do checkin se vazio
+      if(!window.DB.defeitosCI.length){
+        window.DEFEITOS.forEach(function(cat){cat.items.forEach(function(item){window.DB.defeitosCI.push({id:window.genId(),cat:cat.cat,nome:item,ativo:true});});});
+      }
+      // restaura statusTV sempre do Firebase
+      window._tvStatusMap={};
+      window.DB.robos.forEach(function(r){window._tvStatusMap[r.id]=r.statusTV||'fila';});
+      try{localStorage.setItem('moledo_v5',JSON.stringify(window.DB));}catch(e){}
+      window.renderAll();
+      hideSyncToast('☁️ Dados sincronizados!');
+      // Abre ficha do robô se veio de QR code
+      if(window._qrRoboId){
+        var qrR=window.DB.robos.find(function(x){return x.id===window._qrRoboId;});
+        if(qrR)openFichaRobo(window._qrRoboId);
+        window._qrRoboId=null;
+      }
+    }else{
+      hideSyncToast('✅ Pronto!');
+    }
+  }catch(e){console.log('load error',e);hideSyncToast('⚠️ Erro na sincronização');}
+  if(window.zebraRetomarPendente)setTimeout(function(){window.zebraRetomarPendente();},0);
+}
+window.loadFromFirebase=loadFromFirebase;
+
+// ── TOAST SIMPLES (bottom) ──
+// ── SYNC TOAST CENTRAL COM ROBÔ ──
+var _syncToastTimer=null;
+function showSyncToast(label,sub){
+  var el=document.getElementById('sync-toast');
+  var lb=document.getElementById('sync-label');
+  var sb=document.getElementById('sync-sub');
+  if(lb)lb.textContent=label||'Sincronizando';
+  if(sb)sb.textContent=sub||'aguarde um instante...';
+  if(el)el.classList.add('show');
+  clearTimeout(_syncToastTimer);
+}
+function hideSyncToast(successMsg){
+  clearTimeout(_syncToastTimer);
+  _syncToastTimer=setTimeout(function(){
+    var el=document.getElementById('sync-toast');
+    if(el)el.classList.remove('show');
+    if(successMsg)showToast(successMsg);
+  },500);
+}
+
+// ── CONFIG DEFEITOS CHECK-IN ──
+
+// ── RELATÓRIO ──
+function abrirFiltroRelatorio(){
+  var emFila=DB.robos.filter(function(r){return r.status==='reparo'&&!r.bancada&&!r.entradaBancada&&!r.diagnostico;}).length;
+  var naBancada=DB.robos.filter(function(r){return r.status==='reparo'&&(r.bancada||r.entradaBancada)&&!r.diagnostico;}).length;
+  var emDiag=DB.robos.filter(function(r){return r.status==='reparo'&&r.diagnostico;}).length;
+  var finalizados=DB.robos.filter(function(r){return r.status==='garantia';}).length;
+  var todos=DB.robos.filter(function(r){return r.status==='reparo'||r.status==='garantia';}).length;
+  var filtros=[
+    {id:'fila',label:'⏳ Em Fila',count:emFila,color:'#aaa'},
+    {id:'bancada',label:'🔧 Na Bancada',count:naBancada,color:'#ff6d00'},
+    {id:'diagnostico',label:'💊 Diagnóstico',count:emDiag,color:'var(--yellow)'},
+    {id:'finalizados',label:'✅ Finalizados',count:finalizados,color:'#00e676'}
+  ];
+  var html='<div class="modal-title">📋 Relatório</div>'+
+    '<div style="font-size:13px;color:var(--text3);margin-bottom:12px;">Selecione o que deseja imprimir:</div>'+
+    '<div id="rel-filtros" style="display:flex;flex-direction:column;gap:8px;">';
+  filtros.forEach(function(f){
+    html+='<label style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;cursor:pointer;">'+
+      '<div style="display:flex;align-items:center;gap:10px;">'+
+        '<input type="checkbox" id="chk-rel-'+f.id+'" value="'+f.id+'" style="width:18px;height:18px;cursor:pointer;">'+
+        '<span style="font-family:\'Rajdhani\',sans-serif;font-size:14px;font-weight:700;color:'+f.color+';">'+f.label+'</span>'+
+      '</div>'+
+      '<span style="background:var(--bg3);border-radius:6px;padding:2px 10px;font-size:13px;color:var(--text2);">'+f.count+'</span>'+
+    '</label>';
+  });
+  html+='</div>'+
+    '<div style="margin-top:14px;">'+
+      '<button id="btn-imprimir-rel" onclick="confirmarImpressaoRelatorio()" style="width:100%;padding:13px;background:rgba(0,229,255,.15);border:1px solid rgba(0,229,255,.4);border-radius:10px;color:var(--cyan);font-family:\'Rajdhani\',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">🖨️ Imprimir / Salvar PDF</button>'+
+    '</div>';
+  openModal(html);
+}
+function confirmarImpressaoRelatorio(){
+  var selecionados=[];
+  ['fila','bancada','diagnostico','finalizados'].forEach(function(id){
+    var el=document.getElementById('chk-rel-'+id);
+    if(el&&el.checked)selecionados.push(id);
+  });
+  if(!selecionados.length){showToast('Selecione pelo menos uma opção!');return;}
+  gerarRelatorio(selecionados);
+  closeModal();
+}
+function gerarRelatorio(filtro){
+  filtro=filtro||['fila','bancada','diagnostico','finalizados'];
+  var hoje=new Date();hoje.setHours(0,0,0,0);
+  // Filtrar robôs conforme seleção (array)
+  var filtros=Array.isArray(filtro)?filtro:[filtro];
+  var robosBase=DB.robos.filter(function(r){
+    if(filtros.indexOf('fila')!==-1&&r.status==='reparo'&&!r.bancada&&!r.entradaBancada&&!r.diagnostico)return true;
+    if(filtros.indexOf('bancada')!==-1&&r.status==='reparo'&&(r.bancada||r.entradaBancada)&&!r.diagnostico)return true;
+    if(filtros.indexOf('diagnostico')!==-1&&r.status==='reparo'&&r.diagnostico)return true;
+    if(filtros.indexOf('finalizados')!==-1&&r.status==='garantia')return true;
+    return false;
+  });
+  var clientes=[...DB.clientes].sort(function(a,b){return a.nome.localeCompare(b.nome);});
+  var totalRobos=robosBase.length;
+  var rows='';
+  clientes.forEach(function(c){
+    var robos=robosBase.filter(function(r){return r.clienteId===c.id;});
+    if(!robos.length)return;
+    var tipoLabel=c.tipo==='vd'?'🏪 Vendedor':c.tipo==='vc'?'🤝 Vend+Cliente':'👤 Cliente';
+    rows+='<tr class="cliente-row"><td colspan="5"><b>'+esc(c.nome)+'</b> <span class="tipo">'+tipoLabel+'</span> <span class="wa">📱 '+esc(c.whatsapp)+'</span></td></tr>';
+    robos.forEach(function(r){
+      var entrada=r.dataEntrada?new Date(r.dataEntrada+'T00:00:00'):null;
+      var dias=entrada?Math.floor((hoje-entrada)/(1000*60*60*24)):'-';
+      var diasCls=dias>40?'atraso':dias>20?'atencao':'ok';
+      var status=r.status==='garantia'?'🛡️ Garantia':'🔧 Reparo';
+      var diag=r.diagnostico?'✅ Diagnóstico enviado':'⏳ Aguardando';
+      var defeitos=r.defeitos&&r.defeitos.length?r.defeitos.join(', '):'—';
+      rows+='<tr>'+
+        '<td><span class="num">#'+String(r.numVisual).padStart(3,'0')+'</span></td>'+
+        '<td>'+esc(r.modelo||'—')+'</td>'+
+        '<td><span class="dias '+diasCls+'">'+dias+' dias</span></td>'+
+        '<td>'+status+'</td>'+
+        '<td>'+diag+'<br><small>'+defeitos+'</small></td>'+
+      '</tr>';
+    });
+  });
+  if(!rows){showToast('Nenhum robô em reparo!');return;}
+  var html='<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">'+
+    '<title>Relatório MoLeDo ElEtRoTeCh</title>'+
+    '<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;padding:20px;color:#111;}'+
+    'h1{font-size:22px;color:#007ea8;margin-bottom:4px;}'+
+    '.sub{font-size:13px;color:#555;margin-bottom:20px;}'+
+    'table{width:100%;border-collapse:collapse;font-size:13px;}'+
+    'th{background:#007ea8;color:#fff;padding:8px 10px;text-align:left;}'+
+    'td{padding:7px 10px;border-bottom:1px solid #e0e0e0;vertical-align:top;}'+
+    'tr:hover td{background:#f5f5f5;}'+
+    '.cliente-row td{background:#e8f4f8;font-size:14px;padding:10px;border-top:2px solid #007ea8;}'+
+    '.tipo{font-size:11px;background:#e0f0ff;color:#007ea8;border-radius:4px;padding:1px 6px;margin-left:6px;}'+
+    '.wa{font-size:12px;color:#555;margin-left:8px;}'+
+    '.num{font-family:monospace;font-weight:700;color:#007ea8;}'+
+    '.dias{font-weight:700;padding:2px 8px;border-radius:4px;}'+
+    '.ok{background:#e8f5e9;color:#2e7d32;}'+
+    '.atencao{background:#fff8e1;color:#f57f17;}'+
+    '.atraso{background:#fce4ec;color:#c62828;}'+
+    'small{color:#888;font-size:11px;}'+
+    '.total{margin-top:16px;font-size:13px;color:#555;text-align:right;}'+
+    '@media print{body{padding:10px;}button{display:none!important;}}'+
+    '</style></head><body>'+
+    '<h1>📋 MoLeDo ElEtRoTeCh</h1>'+
+    '<div class="sub">Relatório gerado em '+hoje.toLocaleDateString('pt-BR')+' — '+totalRobos+' robô(s)</div>'+
+    '<button onclick="window.print()" style="margin-bottom:16px;padding:8px 16px;background:#007ea8;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">🖨️ Imprimir</button>'+
+    '<table><thead><tr><th>#</th><th>Modelo</th><th>Tempo</th><th>Status</th><th>Diagnóstico / Defeitos</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody></table>'+
+    '<div class="total">Total: <b>'+totalRobos+' robôs</b> em acompanhamento</div>'+
+    '</body></html>';
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var w=window.open(url,'_blank');
+  if(!w){
+    // Popup bloqueado pelo navegador — abrir na mesma aba
+    window.location.href=url;
+    return;
+  }
+  setTimeout(function(){URL.revokeObjectURL(url);},10000);
+  showToast('📋 Relatório aberto!');
+}
+
+// Adiciona botão de logout no header
+function addLogoutBtn(){
+  var header=document.getElementById('app-header');
+  if(header&&!document.getElementById('btn-logout')){
+    var toolbar=document.createElement('div');
+    toolbar.id='app-toolbar';
+    toolbar.style.cssText='position:absolute;bottom:5px;left:0;right:0;display:flex;align-items:center;gap:5px;padding:0 10px;';
+    // contador reparo
+    var cReparo=document.createElement('span');
+    cReparo.id='cnt-reparo';
+    cReparo.style.cssText='background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.25);color:var(--cyan);border-radius:6px;padding:3px 8px;font-family:\'Rajdhani\',sans-serif;font-size:11px;font-weight:700;';
+    cReparo.textContent='🔧 0';
+    toolbar.appendChild(cReparo);
+    // cnt-alerta removido (não utilizado)
+    // espaçador
+    var sp=document.createElement('div');sp.style.flex='1';toolbar.appendChild(sp);
+    // sininho lembretes
+    var btnLembrete=document.createElement('button');
+    btnLembrete.id='btn-lembrete';
+    btnLembrete.innerHTML='🔔';
+    btnLembrete.style.cssText='background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.25);color:#ffd600;border-radius:6px;padding:3px 9px;font-size:13px;cursor:pointer;position:relative;';
+    btnLembrete.onclick=abrirListaLembretes;
+    toolbar.appendChild(btnLembrete);
+    // busca
+    var btnBusca=document.createElement('button');
+    btnBusca.id='btn-busca';btnBusca.textContent='🔍';
+    btnBusca.style.cssText='background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--cyan);border-radius:6px;padding:3px 9px;font-size:13px;cursor:pointer;';
+    btnBusca.onclick=toggleBusca;toolbar.appendChild(btnBusca);
+    // relatório
+    var btnRel=document.createElement('button');
+    btnRel.id='btn-relatorio';btnRel.textContent='📋';
+    btnRel.style.cssText='background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--cyan);border-radius:6px;padding:3px 9px;font-size:13px;cursor:pointer;';
+    btnRel.onclick=abrirFiltroRelatorio;toolbar.appendChild(btnRel);
+    // TV
+    var btnTV=document.createElement('button');
+    btnTV.id='btn-tv';btnTV.textContent='📺 TV';
+    btnTV.style.cssText='background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.25);color:#ffd600;border-radius:6px;padding:3px 9px;font-family:\'Rajdhani\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;';
+    btnTV.onclick=abrirModoTV;toolbar.appendChild(btnTV);
+    // 💵 resumo financeiro (na ordem certa, antes do Sair)
+    var cValor=document.createElement('span');
+    cValor.id='cnt-valor';
+    cValor.style.cssText='background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.25);color:#00e676;border-radius:6px;padding:3px 9px;font-family:\'Rajdhani\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:none;';
+    cValor.title='Ver resumo financeiro';
+    cValor.textContent='💵';
+    cValor.onclick=function(){abrirResumoFinanceiro();};
+    toolbar.appendChild(cValor);
+    // sair
+    var btn=document.createElement('button');
+    btn.id='btn-logout';btn.textContent='🔓 Sair';
+    btn.style.cssText='background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.25);color:#ff1744;border-radius:6px;padding:3px 9px;font-family:\'Rajdhani\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;';
+    btn.onclick=function(){signOut(auth);};toolbar.appendChild(btn);
+    header.appendChild(toolbar);
+    renderContador();
+  }
+}
+
+onAuthStateChanged(auth,function(user){
+  if(user){
+    // Logado — técnico
+    var overlay=document.getElementById('login-overlay');
+    if(overlay)overlay.remove();
+    var qrOverlay=document.getElementById('qr-escolha-overlay');
+    if(qrOverlay)qrOverlay.remove();
+    window._fbReady=true;
+    addLogoutBtn();
+    criarBotaoFlutuante();
+    verificarBackupSemanal();
+    loadFromFirebase();
+  } else {
+    // Não logado
+    window._fbReady=false;
+    if(window.zebraPararPolling)window.zebraPararPolling();
+    if(window.zebraPararLoteTimer)window.zebraPararLoteTimer();
+    var btn=document.getElementById('btn-logout');
+    if(btn)btn.remove();
+    // Se veio de QR → mostra escolha Cliente/Técnico
+    if(window._qrRoboId){
+      mostrarEscolhaQR(window._qrRoboId);
+    } else {
+      mostrarLogin();
+    }
+  }
+});
+
+function mostrarEscolhaQR(roboId){
+  window._qrRoboIdPub=roboId;
+  if(document.getElementById('qr-escolha-overlay'))return;
+  var logoImgs=document.querySelectorAll('img[alt="MoLeDo ElEtRoTeCh"]');
+  var logoSrc=logoImgs.length?logoImgs[0].src:'';
+  var el=document.createElement('div');
+  el.id='qr-escolha-overlay';
+  el.style.cssText='position:fixed;inset:0;background:#0a0c10;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;';
+  el.innerHTML=
+    (logoSrc?'<img src="'+logoSrc+'" style="width:100%;max-width:400px;display:block;margin:0 auto 16px;">':
+      '<div style="font-size:26px;font-weight:900;color:#00e5ff;font-family:\'Orbitron\',monospace;margin-bottom:12px;">MoLeDo ElEtRoTeCh</div>')+
+    '<div style="font-size:15px;color:#00b8d9;letter-spacing:2px;text-align:center;margin-bottom:32px;">REPARO É NOSSA LINGUAGEM · TECNOLOGIA É NOSSA PAIXÃO</div>'+
+    '<div style="display:flex;flex-direction:column;gap:14px;width:100%;max-width:360px;">'+
+      '<button onclick="window.abrirFichaCliente(window._qrRoboIdPub)" style="background:linear-gradient(135deg,#00b8d9,#007ea8);border:none;color:#fff;border-radius:14px;padding:20px;font-family:\'Rajdhani\',sans-serif;font-size:20px;font-weight:700;cursor:pointer;letter-spacing:1px;">👤 Sou Cliente</button>'+
+      '<button onclick="window.abrirLoginTecnico()" style="background:#111520;border:2px solid #00e5ff;color:#00e5ff;border-radius:14px;padding:20px;font-family:\'Rajdhani\',sans-serif;font-size:20px;font-weight:700;cursor:pointer;letter-spacing:1px;">🔧 Sou Técnico</button>'+
+    '</div>';
+  document.body.appendChild(el);
+}
+
+function abrirLoginTecnico(){
+  var el=document.getElementById('qr-escolha-overlay');
+  if(el)el.remove();
+  mostrarLogin();
+}
+
+function abrirFichaCliente(roboId){
+  var el=document.getElementById('qr-escolha-overlay');
+  if(el)el.remove();
+  // Busca dados públicos do Firebase
+  var logoImgs=document.querySelectorAll('img[alt="MoLeDo ElEtRoTeCh"]');
+  var logoSrc=logoImgs.length?logoImgs[0].src:'';
+  // Mostra animação enquanto carrega
+  var loading=document.createElement('div');
+  loading.id='pub-loading';
+  loading.style.cssText='position:fixed;inset:0;background:#0a0c10;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+  loading.innerHTML=
+    (logoSrc?'<img src="'+logoSrc+'" style="width:100%;max-width:400px;display:block;margin:0 auto 20px;">':'')+
+    '<div style="font-size:15px;color:#00b8d9;letter-spacing:2px;text-align:center;margin-bottom:20px;">REPARO É NOSSA LINGUAGEM · TECNOLOGIA É NOSSA PAIXÃO</div>'+
+    '<div style="font-size:22px;font-weight:700;color:#fff;text-align:center;margin-bottom:8px;">🙏 Muito obrigado por confiar em nós!</div>';
+  document.body.appendChild(loading);
+  // Busca do Firebase após 4 segundos de animação
+  setTimeout(function(){
+    import('https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js').then(function(fs){
+      import('https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js').then(function(fa){
+        var apps=fa.getApps?fa.getApps():[];
+        var app2=apps.length?apps[0]:null;
+        if(!app2){var lo=document.getElementById('pub-loading');if(lo)lo.remove();mostrarFichaClienteSimples(roboId,logoSrc);return;}
+        var db2=fs.getFirestore(app2);
+        fs.getDoc(fs.doc(db2,'publico',roboId)).then(function(snap){
+          var lo=document.getElementById('pub-loading');if(lo)lo.remove();
+          if(snap.exists()){mostrarFichaClienteCompleta(snap.data(),logoSrc);}
+          else{mostrarFichaClienteSimples(roboId,logoSrc);}
+        }).catch(function(){
+          var lo=document.getElementById('pub-loading');if(lo)lo.remove();
+          mostrarFichaClienteSimples(roboId,logoSrc);
+        });
+      });
+    }).catch(function(){
+      var lo=document.getElementById('pub-loading');if(lo)lo.remove();
+      mostrarFichaClienteSimples(roboId,logoSrc);
+    });
+  },4000);
+}
+
+window.abrirLoginTecnico=abrirLoginTecnico;
+window.abrirFichaCliente=abrirFichaCliente;
+window.abrirFiltroRelatorio=abrirFiltroRelatorio;
+window.confirmarImpressaoRelatorio=confirmarImpressaoRelatorio;
+window.gerarRelatorio=gerarRelatorio;
+
+function mostrarFichaCancelada(d,logoSrc){
+  function fmtD(iso){if(!iso)return'—';return new Date(iso+'T12:00:00').toLocaleDateString('pt-BR');}
+  var diagTotal=d.diagnostico?d.diagnostico.total:0;
+  var diagTipo=d.diagnostico?d.diagnostico.tipo:'';
+  var diagDesc=d.diagnostico?d.diagnostico.descricao:'';
+  var numOS=d.numOS||'—';
+  var modelo=d.modelo||'—';
+  var fmtVal2=function(v){return'R$ '+Number(v||0).toFixed(2).replace('.',',');};
+  var el=document.createElement('div');
+  el.id='pub-ficha';
+  el.style.cssText='position:fixed;inset:0;background:#0d0000;z-index:9999;overflow-y:auto;font-family:Arial,sans-serif;color:#fff;';
+  el.innerHTML=
+    '<div style="padding:20px;max-width:500px;margin:0 auto;">'+
+      (logoSrc?'<img src="'+logoSrc+'" style="width:100%;max-width:400px;display:block;margin:16px auto 20px;">':'')+
+      // Badge cancelado
+      '<div style="background:rgba(200,0,0,.2);border:2px solid #c00;border-radius:12px;padding:20px;text-align:center;margin-bottom:16px;">'+
+        '<div style="font-size:40px;margin-bottom:8px;">❌</div>'+
+        '<div style="font-size:20px;font-weight:900;color:#ff4444;margin-bottom:4px;">Serviço Cancelado</div>'+
+        '<div style="font-size:13px;color:#ff9999;">'+numOS+' · '+modelo+'</div>'+
+      '</div>'+
+      // Diagnóstico
+      (diagTotal?'<div style="background:#1a0000;border:1px solid #660000;border-radius:10px;padding:14px;margin-bottom:14px;">'+
+        '<div style="font-size:11px;font-weight:700;color:#ff6666;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">💊 Diagnóstico Realizado</div>'+
+        (diagTipo?'<div style="font-size:13px;color:#ccc;margin-bottom:6px;">'+diagTipo+'</div>':'')+
+        (diagDesc?'<div style="font-size:12px;color:#aaa;margin-bottom:10px;">'+diagDesc+'</div>':'')+
+        '<div style="font-size:18px;font-weight:900;color:#ff4444;">Total: '+fmtVal2(diagTotal)+'</div>'+
+      '</div>':'')+
+      // Mensagem de desculpa
+      '<div style="background:#1a0000;border:1px solid #440000;border-radius:10px;padding:16px;margin-bottom:14px;text-align:center;line-height:1.7;font-size:14px;color:#ffcccc;">'+
+        '😔 Ficamos muito tristes por não conseguir concluir o serviço do seu robô.<br><br>'+
+        (diagTotal?'O valor do diagnóstico cobrado foi de <b style="color:#ff4444;">'+fmtVal2(diagTotal)+'</b>.<br><br>'+
+        '💡 <b>Boa notícia:</b> caso queira retornar para a avaliação, esse valor já será abatido no total — você pagaria apenas o restante do serviço!':'')+
+      '</div>'+
+      // CTA retornar
+      '<div style="background:#0a1a0a;border:1px solid #1a4a1a;border-radius:10px;padding:14px;margin-bottom:14px;text-align:center;font-size:13px;color:#88cc88;line-height:1.6;">'+
+        '🤝 Estamos à disposição sempre que precisar.<br>Entre em contato e resolveremos juntos!'+
+      '</div>'+
+      '<button onclick="window.open(\'https://wa.me/5544999724074?text=Olá! Vi a ficha do meu robô e gostaria de retomar o serviço.\',\'_blank\')" style="background:#25d366;color:#fff;border:none;border-radius:10px;padding:14px;width:100%;font-size:16px;font-weight:900;cursor:pointer;margin-bottom:10px;">💬 Falar no WhatsApp</button>'+
+      '<a href="tel:+5544999724074" style="display:block;background:#1a0a0a;color:#ff6666;border:1px solid rgba(255,100,100,.3);border-radius:10px;padding:14px;width:100%;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:14px;text-align:center;text-decoration:none;box-sizing:border-box;">📞 (44) 9 9972-4074 · MoLeDo ElEtRoTeCh</a>'+
+      '<div style="text-align:center;padding:16px;font-size:12px;color:#553333;line-height:1.8;">MoLeDo ElEtRoTeCh<br>Reparo é nossa linguagem · Tecnologia é nossa paixão</div>'+
+    '</div>';
+  document.body.appendChild(el);
+}
+function mostrarFichaClienteCompleta(d,logoSrc){
+  // TELA VERMELHA — cancelado
+  if(d.status==='cancelado'){
+    mostrarFichaCancelada(d,logoSrc);
+    return;
+  }
+  function fmtD(iso){if(!iso)return'—';return new Date(iso+'T12:00:00').toLocaleDateString('pt-BR');}
+  var hoje=new Date();
+  var entrada=d.dataEntrada?new Date(d.dataEntrada+'T00:00:00'):null;
+  var diasTotal=entrada?Math.floor((hoje-entrada)/(1000*60*60*24)):0;
+  // desculpa só aparece se passou 30 dias E robô já foi pra garantia (tem dataEntrega)
+  var passou30=diasTotal>30&&!!d.dataEntrega;
+  var CITENS=[
+    {id:'vassoura_central',nome:'Vassoura Central'},{id:'vassoura_lat_esq',nome:'Vassoura Lateral Esquerda'},
+    {id:'vassoura_lat_dir',nome:'Vassoura Lateral Direita'},{id:'reservatorio_poco',nome:'Reservatório de Poeira/Filtro'},
+    {id:'reservatorio_agua',nome:'Reservatório de Água'},{id:'carregador_dock',nome:'Carregador/Dock'},
+    {id:'cabo_carregador',nome:'Cabo do Carregador'},{id:'tampa_superior',nome:'Tampa Superior'},
+    {id:'mop_esq',nome:'Mop Lateral Esquerdo'},{id:'mop_dir',nome:'Mop Lateral Direito'},
+    {id:'mop_unico',nome:'Mop Único'},{id:'controle_remoto',nome:'Controle Remoto'}
+  ];
+  var itens=d.itens||{};
+  var vieram=CITENS.filter(function(i){return itens[i.id]==='veio';});
+  var naoVieram=CITENS.filter(function(i){return itens[i.id]==='nao';});
+  var checkHtml='';
+  if(vieram.length){
+    checkHtml+='<div style="font-size:11px;font-weight:700;color:#00b8d9;letter-spacing:2px;text-transform:uppercase;margin:14px 0 8px;border-bottom:1px solid #1e2d45;padding-bottom:4px;">📦 Itens recebidos</div>';
+    vieram.forEach(function(i){checkHtml+='<div style="font-size:14px;padding:6px 0;border-bottom:1px solid #0e1118;color:#aaa;">✅ '+i.nome+'</div>';});
+  }
+  if(naoVieram.length){
+    checkHtml+='<div style="font-size:11px;font-weight:700;color:#ff6d00;letter-spacing:2px;text-transform:uppercase;margin:14px 0 8px;border-bottom:1px solid #1e2d45;padding-bottom:4px;">⚠️ Não recebidos</div>';
+    naoVieram.forEach(function(i){checkHtml+='<div style="font-size:14px;padding:6px 0;border-bottom:1px solid #0e1118;color:#ff6d00;">❌ '+i.nome+'</div>';});
+  }
+  var wa=(d.whatsapp||'').replace(/\D/g,'');
+  if(wa.length===11)wa='55'+wa;
+  // MENSAGENS VARIÁVEIS de volte sempre
+  var MSGS_VOLTE=[
+    '🤖✨ Volte sempre! Seu robô agradece!',
+    '😊 Foi um prazer atender você! Estamos aqui quando precisar.',
+    '🙏 Obrigado pela confiança! Até a próxima!',
+    '❤️ Seu robô está em ótimas mãos — e sempre estará!',
+    '🌟 Volte sempre! A MoLeDo é a casa do seu robô.',
+    '💪 Missão cumprida! Volte quando precisar, estaremos aqui!',
+    '🤝 Parceria feita! Qualquer problema, pode contar com a gente.',
+    '🛡️ Garantia ativa! E nossa amizade também. Volte sempre!',
+    '🚀 Robô no ar! Foi ótimo te atender. Até a próxima!',
+    '💙 Obrigado por escolher a MoLeDo! Você faz parte da família.'
+  ];
+  var msgVolte=MSGS_VOLTE[Math.floor(Math.random()*MSGS_VOLTE.length)];
+  // Número da firma para adicionar na agenda
+  var numFirma='44999724074';
+  var vCardUrl='data:text/vcard;charset=utf-8,BEGIN:VCARD%0AVERSION:3.0%0AFN:MoLeDo%20El%C3%8AtRoTeCh%0ATEL:+55'+numFirma+'%0AORG:MoLeDo%20El%C3%8AtRoTeCh%0AEND:VCARD';
+  var el=document.createElement('div');
+  el.id='pub-ficha';
+  el.style.cssText='position:fixed;inset:0;background:#0a0c10;z-index:9999;overflow-y:auto;font-family:Arial,sans-serif;color:#e0f0ff;';
+  el.innerHTML=
+    '<div style="padding:20px;max-width:500px;margin:0 auto;">'+
+      (logoSrc?'<img src="'+logoSrc+'" style="width:100%;max-width:400px;display:block;margin:16px auto 20px;">':'')+
+      '<div style="background:#111520;border:1px solid #1e2d45;border-radius:12px;padding:16px;margin-bottom:14px;">'+
+        '<div style="font-size:32px;font-weight:900;color:#00e5ff;font-family:monospace;">'+(d.numOS||'—')+'</div>'+
+        '<div style="font-size:18px;font-weight:700;color:#fff;margin:4px 0;">'+(d.modelo||'—')+'</div>'+
+        (d.voltagem&&d.voltagem!=='—'?'<div style="font-size:14px;color:#ffd600;">⚡ '+d.voltagem+'</div>':'')+
+        '<div style="font-size:11px;font-weight:700;color:#00b8d9;letter-spacing:2px;text-transform:uppercase;margin:14px 0 8px;border-bottom:1px solid #1e2d45;padding-bottom:4px;">📅 Datas</div>'+
+        '<div style="font-size:13px;color:#8899bb;margin:4px 0;">📥 Entrada: '+fmtD(d.dataEntrada)+'</div>'+
+        (d.dataEntrega?'<div style="font-size:13px;color:#8899bb;margin:4px 0;">📦 Entrega: '+fmtD(d.dataEntrega)+'</div>':'')+
+        (d.garantiaAte?'<div style="background:rgba(170,0,255,.12);border:1px solid rgba(170,0,255,.4);border-radius:10px;padding:14px;margin:10px 0;text-align:center;">'+
+        '<div style="font-size:28px;margin-bottom:6px;">🛡️</div>'+
+        '<div style="font-size:15px;font-weight:700;color:#ce93d8;margin-bottom:4px;">Robô em Garantia</div>'+
+        '<div style="font-size:13px;color:#aaa;">Válida até: <b style="color:#ce93d8;">'+fmtD(d.garantiaAte)+'</b></div>'+
+        '</div>':'')+
+      '</div>'+
+      (checkHtml?'<div style="background:#111520;border:1px solid #1e2d45;border-radius:12px;padding:16px;margin-bottom:14px;">'+checkHtml+'</div>':'')+
+      (passou30?'<div style="background:#1a0a00;border:1px solid #ff6d00;border-radius:8px;padding:12px;margin:12px 0;font-size:13px;color:#ff6d00;text-align:center;">😔 Pedimos desculpas pelo prazo. Agradecemos imensamente sua paciência!</div>':'')+
+      '<div style="background:#0a1520;border:1px solid #00b8d9;border-radius:8px;padding:14px;margin:12px 0;font-size:15px;color:#e0f0ff;text-align:center;line-height:1.6;font-weight:600;">'+msgVolte+'</div>'+
+      '<div style="font-size:13px;color:#aaa;text-align:center;margin-bottom:14px;line-height:1.6;">❤️ Agradecemos por acreditar em nós e confiar seu equipamento em nossas mãos.<br>Qualquer dúvida, estamos à disposição! 😊</div>'+
+      '<button onclick="window.open(\'https://wa.me/5544999724074?text=Olá! Vi a ficha do meu robô e quero falar sobre ele.\',\'_blank\')" style="background:#25d366;color:#fff;border:none;border-radius:10px;padding:14px;width:100%;font-size:16px;font-weight:900;cursor:pointer;margin-bottom:10px;">💬 Falar no WhatsApp</button>'+
+      '<a href="tel:+5544999724074" style="display:block;background:#1e2d45;color:#00e5ff;border:1px solid rgba(0,229,255,.3);border-radius:10px;padding:14px;width:100%;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:14px;text-align:center;text-decoration:none;box-sizing:border-box;">📞 (44) 9 9972-4074 · MoLeDo ElEtRoTeCh</a>'+
+      '<div style="text-align:center;padding:16px;font-size:12px;color:#556688;line-height:1.8;">MoLeDo ElEtRoTeCh<br>Reparo é nossa linguagem · Tecnologia é nossa paixão</div>'+
+    '</div>';
+  document.body.appendChild(el);
+}
+
+function mostrarFichaClienteSimples(roboId,logoSrc){
+  var el=document.createElement('div');
+  el.id='pub-ficha';
+  el.style.cssText='position:fixed;inset:0;background:#0a0c10;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:Arial,sans-serif;';
+  el.innerHTML=
+    (logoSrc?'<img src="'+logoSrc+'" style="width:100%;max-width:340px;display:block;margin:0 auto 24px;">':'')+
+    '<div style="background:#111520;border:1px solid #1e2d45;border-radius:14px;padding:24px;max-width:340px;width:100%;text-align:center;margin-bottom:16px;">'+
+      '<div style="font-size:42px;margin-bottom:12px;">🔍</div>'+
+      '<div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:10px;">Ops! Algo deu errado</div>'+
+      '<div style="font-size:14px;color:#aaa;line-height:1.7;">Tivemos um probleminha ao carregar as informações deste robô.<br><br>Entre em contato com a gente para verificar! 😊</div>'+
+    '</div>'+
+    '<button onclick="window.open(\'https://wa.me/5544999724074?text=Olá! Escaneei o QR do meu robô mas não apareceram as informações. Pode verificar?\',\'_blank\')" style="background:#25d366;color:#fff;border:none;border-radius:10px;padding:14px;width:100%;max-width:340px;font-size:15px;font-weight:900;cursor:pointer;margin-bottom:10px;">💬 Falar no WhatsApp</button>'+
+    '<a href="tel:+5544999724074" style="display:block;background:#111520;color:#00e5ff;border:1px solid rgba(0,229,255,.2);border-radius:10px;padding:12px;width:100%;max-width:340px;font-size:14px;font-weight:700;text-align:center;text-decoration:none;box-sizing:border-box;margin-bottom:10px;">📞 (44) 9 9972-4074</a>'+
+    '<button onclick="window.abrirLoginTecnico&&window.abrirLoginTecnico()" style="background:#111520;color:#ffd600;border:1px solid rgba(255,214,0,.3);border-radius:10px;padding:12px;width:100%;max-width:340px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:20px;">🔧 Sou Técnico — Fazer Login</button>'+
+    '<div style="text-align:center;font-size:11px;color:#334466;">MoLeDo ElEtRoTeCh · Reparo é nossa linguagem · Tecnologia é nossa paixão</div>';
+  document.body.appendChild(el);
+}
+
+</script>
+</body>
+</html>
