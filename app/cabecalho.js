@@ -1,14 +1,13 @@
 function renderContador(){
-  var hoje=new Date();hoje.setHours(0,0,0,0);
-  var reparo=DB.robos.filter(function(r){return r.status==='reparo';}).length;
-  var garantia=DB.robos.filter(function(r){return r.status==='garantia';}).length;
-  var atrasados=DB.robos.filter(function(r){
-    if(r.status!=='reparo'&&r.status!=='garantia')return false;
-    var e=r.dataEntrada?new Date(r.dataEntrada+'T00:00:00'):null;
-    return e&&Math.floor((hoje-e)/(1000*60*60*24))>40;
-  }).length;
+  var estatisticas=calcularEstatisticasAtendimentos();
   var cr=document.getElementById('cnt-reparo');
-  if(cr)cr.textContent='🔧 '+(reparo+garantia)+(garantia?' (🛡️ '+garantia+')':'');
+  if(cr){
+    cr.textContent='🔧 '+estatisticas.servicosAFazer+' · 🛡️ '+estatisticas.garantias;
+    cr.title='Ver estatísticas dos atendimentos';
+    cr.setAttribute('role','button');cr.setAttribute('tabindex','0');
+    cr.onclick=abrirDetalhesEstatisticas;
+    cr.onkeydown=function(event){if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirDetalhesEstatisticas();}};
+  }
   // MELHORIA 6: soma diagnósticos em aberto (reparo + garantia)
   var totalAberto=DB.robos.filter(function(r){return (r.status==='reparo'||r.status==='garantia')&&r.diagnostico;}).reduce(function(acc,r){return acc+(r.diagnostico.total||0);},0);
   var cv=document.getElementById('cnt-valor');

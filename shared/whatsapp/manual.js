@@ -4,7 +4,9 @@ function abrirMensagemManual(clienteId,mensagem){
   var wa=(c.whatsapp||'').replace(/\D/g,'');
   if(wa.length>=10&&!wa.startsWith('55'))wa='55'+wa;
   if(wa.length<10){showToast('Confira o WhatsApp do responsável.');return false;}
-  var janela=window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(mensagem),'_blank','noopener');
-  return true;
+  try{
+    window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(mensagem),'_blank','noopener');
+    return true;
+  }catch(erro){showToast('O WhatsApp não abriu. Verifique o bloqueio de pop-ups.');return false;}
 }
 var adaptadorCobrancaManual={nome:'manual',preparar:function(clienteId,mensagem){return abrirMensagemManual(clienteId,mensagem);}};

@@ -131,9 +131,11 @@ function atualizarTotalDiag(){
 
 function selParcela(n){parcelaSel=n;atualizarTotalDiag();}
 
-function salvarDiagnostico(){
+// Única rotina de persistência usada por SALVAR e SALVAR E ENVIAR.
+function persistirDiagnostico(){
   var r=DB.robos.find(function(x){return x.id===diagRoboId;});if(!r)return;
   var el=document.getElementById('diag-content');
+  if(!el){showToast('Não foi possível localizar o Diagnóstico.');return null;}
   var abertura=parseFloat(el.dataset.abertura||200);
   var desconto=parseFloat(document.getElementById('diag-desconto').value)||0;
   var frete=parseFloat(document.getElementById('diag-frete').value)||0;
@@ -143,24 +145,40 @@ function salvarDiagnostico(){
   var itens=window._avulsoItens.filter(function(it){return (it.nome&&it.nome.trim())||Number(it.preco)>0;}).map(function(it){return{catalogoId:null,nome:it.nome||'Item',preco:Number(it.preco)||0};});
   var somaItens=itens.reduce(function(a,it){return a+it.preco;},0);
   var total=Math.max(0,abertura+somaItens-desconto+frete);
+  if(!isFinite(abertura)||!isFinite(total)){showToast('Confira os valores do Diagnóstico.');return null;}
   r.diagnostico={data:todayISO(),abertura:abertura,itens:itens,desconto:desconto,frete:frete,avulso:0,avulsoDesc:'',total:total,avista:total,descricao:descricao};
   if(!r.historicoDiagnosticos)r.historicoDiagnosticos=[];
   var snap=JSON.parse(JSON.stringify(r.diagnostico)); snap.salvoEm=new Date().toISOString();
   var ultimo=r.historicoDiagnosticos[r.historicoDiagnosticos.length-1];
   if(!ultimo||JSON.stringify(Object.assign({},ultimo,{salvoEm:undefined}))!==JSON.stringify(Object.assign({},snap,{salvoEm:undefined})))r.historicoDiagnosticos.push(snap);
   r.diagnosticoSalvo=true;
-  saveDB();showToast('💊 Diagnóstico salvo!');renderBadges();renderDiagContent(r);renderAll();
+  saveDB();renderBadges();renderAll();
+  if(fichaClienteId)refreshFichaContent();
   if(currentTab==='diagnostico')renderDiagnosticoLista();
+  return r;
+}
+
+function salvarDiagnostico(){
+  var salvo=persistirDiagnostico();if(!salvo)return false;
+  fecharDiagnostico();
+  showToast('💊 Diagnóstico salvo!');
+  return true;
 }
 
 function salvarDiagnosticoEEnviar(){
-  salvarDiagnostico();
-  var r=DB.robos.find(function(x){return x.id===diagRoboId;});if(!r)return;
+  var r=persistirDiagnostico();if(!r)return false;
+  var roboId=r.id;
   fecharDiagnostico();
   setTimeout(function(){
-    waTipoAtual='diagnostico';
-    abrirWhatsApp(r.id);
+    try{
+      waTipoAtual='diagnostico';
+      abrirWhatsApp(roboId);
+      showToast('💊 Diagnóstico salvo. WhatsApp preparado para abertura manual.');
+    }catch(erro){
+      showToast('Diagnóstico salvo, mas o WhatsApp não abriu.');
+    }
   },300);
+  return true;
 }
 
 function diagnosticoSemCodigo(id){

@@ -21,6 +21,7 @@ function renderRoboCard(r,showEntregue){
   var msgs=r.mensagens||[];
   var waHtml=msgs.length?'<div class="wa-last">💬 Último envio: '+fmtData(msgs[msgs.length-1].data)+' — '+(WA_LABELS[msgs[msgs.length-1].tipo]||msgs[msgs.length-1].tipo)+'</div>':'';
   var diagHtml=r.diagnostico?'<div class="diag-badge">💊 Diagnóstico: '+fmtVal(r.diagnostico.total)+' · '+fmtData(r.diagnostico.data)+'</div>':'';
+  var cobrancaHtml=typeof indicadorCobrancaAtendimento==='function'&&indicadorCobrancaAtendimento(r)?'<div style="font-size:12px;color:var(--yellow);margin:5px 0;">'+indicadorCobrancaAtendimento(r)+'</div>':'';
   // MELHORIA 1: cor de fundo suave no contador de dias
   var diasCorBg='';
   if(r.status==='reparo'){
@@ -32,7 +33,7 @@ function renderRoboCard(r,showEntregue){
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'+
     '<div><div class="robot-num">'+num+'</div><div class="robot-sn">'+esc(r.sn)+'</div><div class="robot-model">'+esc(descricaoEquipamento(r))+'</div>'+(r.voltagem&&r.voltagem!=='—'?'<div class="robot-volt">⚡ '+esc(r.voltagem)+'</div>':'')+(r.nomeClienteFinal?'<div style="font-size:11px;font-weight:700;color:#00c896;margin-top:2px;">👤 '+esc(r.nomeClienteFinal)+'</div>':'')+'</div>'+
     '<div style="text-align:right;">'+(r.status==='reparo'?(aguardandoRet?'<div style="font-size:24px;">📦</div><div class="days-label" style="color:#00c896;">retirada</div>':'<div class="days-big" style="color:'+dc(dias)+';'+diasCorBg+'">'+dias+'</div><div class="days-label">dias</div>'):'')+(r.status==='garantia'?'<div class="garantia-shield">🛡️</div>':'')+'</div></div>'+
-    statusHtml+defHtml+diagHtml+waHtml+
+    statusHtml+defHtml+diagHtml+cobrancaHtml+waHtml+
     // MELHORIA 5: nota rápida visível
     (r.notaRapida?'<div style="background:rgba(255,214,0,.06);border-left:3px solid rgba(255,214,0,.5);border-radius:0 6px 6px 0;padding:5px 8px;font-size:12px;color:var(--yellow);margin-bottom:6px;">📝 '+esc(r.notaRapida)+'</div>':'')+
     // MELHORIA 3: mini timeline
@@ -40,6 +41,7 @@ function renderRoboCard(r,showEntregue){
     '<div class="robot-meta">📅 Entrada: '+fmtData(r.dataEntrada)+(r.dataEntrega?' · 📦 Entrega: '+fmtData(r.dataEntrega):'')+(r.obs?'<br>📝 '+esc(r.obs):'')+'</div>'+
     '<div class="robot-actions">'+
     '<button class="btn btn-cyan" onclick="openFichaRobo(this.dataset.id)" data-id="'+r.id+'">📋 Ficha</button>'+
+    (typeof cobrancaDisponivelNoAtendimento==='function'&&cobrancaDisponivelNoAtendimento(r)?'<button class="btn btn-green" onclick="abrirEditorCobranca(this.dataset.id)" data-id="'+r.id+'">💰 Cobrança</button>':'')+
     (r.status==='reparo'?'<button class="btn btn-close" onclick="abrirNotaRapida(this.dataset.id)" data-id="'+r.id+'" title="Nota rápida">📝</button>':'')+
     (r.status==='reparo'&&r.bancada?'<button class="btn btn-wa" onclick="reenviarWABancada(this.dataset.id)" data-id="'+r.id+'" title="Reenviar WhatsApp bancada" style="padding:8px 10px;font-size:12px;">🔧💬</button>':'')+
     (aguardandoRet?'<button class="btn" onclick="enviarLembreteRetirada(this.dataset.id)" data-id="'+r.id+'" style="background:rgba(0,200,150,.15);border:1px solid rgba(0,200,150,.4);color:#00c896;padding:8px 10px;font-size:12px;">📦💬 Lembrar retirada</button>':'')+

@@ -25,6 +25,16 @@ function estadoCobranca(r,hoje){
   return c.dataPrometida<hoje?'atrasada':'proxima';
 }
 function cobrancaElegivel(r,hoje){var estado=estadoCobranca(r,hoje);return estado==='vence_hoje'||estado==='atrasada';}
+function cobrancaDisponivelNoAtendimento(r){return !!r&&(!!r.cobranca||((r.servicoPronto||r.dataServicoPronto||r.status==='garantia')&&!atendimentoPago(r)&&getValorCobravel(r)>0));}
+function indicadorCobrancaAtendimento(r){
+  if(!r||(!r.cobranca&&!atendimentoPago(r)))return '';
+  if(atendimentoPago(r)||(r.cobranca&&r.cobranca.status==='paga'))return '✅ Pago';
+  if(!r.cobranca)return '';
+  var estado=estadoCobranca(r);
+  if(estado==='pausada')return '⏸ Cobrança pausada';
+  if(estado==='vence_hoje')return '⚠️ Cobrança hoje';
+  return '💰 Pagamento: '+fmtData(r.cobranca.dataPrometida);
+}
 function programarCobranca(id,data,hora,observacoes){
   var r=localizarAtendimentoCobranca(id);if(!r)return false;
   if(atendimentoPago(r)){showToast('Atendimento já pago.');return false;}
@@ -36,8 +46,10 @@ function programarCobranca(id,data,hora,observacoes){
   if(!mesma)c.promessaId=genId();
   c.dataPrometida=data;c.horario=hora||'';c.observacoes=observacoes||'';c.ativa=true;c.proximaCobranca=data;
   c.status=mesma&&promessaCobrancaPreparada(c)?'preparada':anterior?'reagendada':'promessa';
-  registrarEventoCobranca(r,antiga&&antiga!==data?'reagendamento':'promessa',antiga&&antiga!==data?'De '+antiga+' para '+data:'Promessa para '+data,'promessa|'+c.promessaId);
-  saveDB();return true;
+  var detalhes=antiga&&antiga!==data?'De '+antiga+' para '+data:'Promessa para '+data;
+  if(observacoes)detalhes+=' · Observação: '+observacoes;
+  registrarEventoCobranca(r,antiga&&antiga!==data?'reagendamento':'promessa',detalhes,'promessa|'+c.promessaId);
+  saveDB();renderAll();return true;
 }
 function pausarCobranca(id,motivo){
   var r=localizarAtendimentoCobranca(id);if(!r||!r.cobranca||atendimentoPago(r))return;
@@ -89,13 +101,28 @@ function enviarCobrancaManual(id){
   var texto=document.getElementById('cob-mensagem').value;
   var chave='abertura|'+r.cobranca.dataPrometida;var repetida=r.cobranca.historico.some(function(e){return e.chave===chave;});
   if(repetida&&!confirm('A conversa desta promessa já foi aberta. Abrir novamente explicitamente?'))return;
-  if(adaptadorCobrancaManual.preparar(r.clienteId,texto)){registrarEventoCobranca(r,'whatsapp_aberto_manual','Conversa aberta pelo usuário; envio/entrega não confirmados',repetida?'reabertura|'+genId():chave);saveDB();}
+  if(adaptadorCobrancaManual.preparar(r.clienteId,texto)){registrarEventoCobranca(r,'whatsapp_aberto_manual','Conversa aberta pelo usuário; envio/entrega não confirmados',repetida?'reabertura|'+genId():chave);saveDB();return true;}
+  showToast('Cobrança preservada, mas o WhatsApp não abriu.');return false;
 }
 function abrirEditorCobranca(id){
-  var r=localizarAtendimentoCobranca(id);if(!r)return;var c=r.cobranca||{};
-  openModal('<div class="modal-title">Programar cobrança · '+esc(descricaoEquipamento(r))+'</div><div>OS '+esc(r.numOS||'—')+' · '+fmtVal(getValorCobravel(r))+'</div><label>Data prometida<input id="cob-data" type="date" class="form-input" value="'+esc(c.dataPrometida||todayISO())+'"></label><label>Horário de referência (sem envio automático)<input id="cob-hora" type="time" class="form-input" value="'+esc(c.horario||'')+'"></label><label>Observações<textarea id="cob-obs" class="form-input">'+esc(c.observacoes||'')+'</textarea></label><div class="modal-actions"><button class="btn btn-cyan" data-id="'+esc(id)+'" onclick="salvarEditorCobranca(this.dataset.id)">Salvar promessa</button><button class="btn btn-close" onclick="abrirPainelCobrancas()">Voltar</button></div>');
+  var r=localizarAtendimentoCobranca(id);if(!r)return;if(!cobrancaDisponivelNoAtendimento(r)){showToast('Este atendimento ainda não está disponível para cobrança.');return;}
+  var c=r.cobranca||{},cliente=DB.clientes.find(function(x){return x.id===r.clienteId;}),estado=estadoCobranca(r);
+  var acoes=c.dataPrometida?'<div class="modal-actions" style="flex-wrap:wrap;">'+
+    (estado==='pausada'?'<button class="btn btn-cyan" data-id="'+esc(id)+'" onclick="reativarCobranca(this.dataset.id);abrirEditorCobranca(this.dataset.id)">REATIVAR</button>':'<button class="btn btn-close" data-id="'+esc(id)+'" onclick="acaoCobrancaAtendimento(this.dataset.id,\'pausar\')">PAUSAR</button>')+
+    (!atendimentoPago(r)?'<button class="btn btn-green" data-id="'+esc(id)+'" onclick="marcarRoboPago(this.dataset.id)">MARCAR PAGO</button>':'')+
+    (['pausada','paga','cancelada'].indexOf(estado)<0?'<button class="btn btn-wa" data-id="'+esc(id)+'" onclick="prepararCobranca(this.dataset.id)">COBRAR AGORA</button>':'')+
+    '<button class="btn btn-close" data-id="'+esc(id)+'" onclick="historicoCobrancaAtendimento(this.dataset.id)">HISTÓRICO</button></div>':'';
+  openModal('<div class="modal-title">💰 PAGAMENTO COMBINADO</div><div class="card" style="line-height:1.6;margin-bottom:12px;">'+
+    '<div><strong>Cliente:</strong> '+esc(cliente?cliente.nome:'—')+'</div><div><strong>WhatsApp:</strong> '+esc(cliente?cliente.whatsapp:'—')+'</div>'+
+    '<div><strong>Equipamento:</strong> '+esc(descricaoEquipamento(r))+'</div><div><strong>OS:</strong> '+esc(r.numOS||'#'+r.numVisual)+'</div>'+
+    '<div><strong>Valor pendente:</strong> '+fmtVal(getValorCobravel(r))+'</div></div>'+
+    '<label>Data prometida<input id="cob-data" type="date" class="form-input" value="'+esc(c.dataPrometida||todayISO())+'"></label>'+
+    '<label>Observação (opcional)<textarea id="cob-obs" class="form-input">'+esc(c.observacoes||'')+'</textarea></label>'+acoes+
+    '<div class="modal-actions"><button class="btn btn-cyan" data-id="'+esc(id)+'" onclick="salvarEditorCobranca(this.dataset.id)">SALVAR</button><button class="btn btn-close" onclick="closeModal()">CANCELAR</button></div>');
 }
-function salvarEditorCobranca(id){if(programarCobranca(id,document.getElementById('cob-data').value,document.getElementById('cob-hora').value,document.getElementById('cob-obs').value))abrirPainelCobrancas();}
+function salvarEditorCobranca(id){if(programarCobranca(id,document.getElementById('cob-data').value,'',document.getElementById('cob-obs').value)){showToast('Pagamento combinado salvo.');openFichaRobo(id);}}
+function acaoCobrancaAtendimento(id,acao){var motivo=prompt('Motivo da pausa:');if(motivo===null)return;pausarCobranca(id,motivo);abrirEditorCobranca(id);}
+function historicoCobrancaAtendimento(id){var r=localizarAtendimentoCobranca(id);if(!r||!r.cobranca)return;openModal('<div class="modal-title">Histórico da cobrança</div>'+r.cobranca.historico.map(function(e){return '<div class="card">'+esc(new Date(e.em).toLocaleString('pt-BR'))+' · '+esc(e.tipo)+'<div>'+esc(e.detalhes)+'</div></div>';}).join('')+'<button class="btn btn-close" data-id="'+esc(id)+'" onclick="abrirEditorCobranca(this.dataset.id)">Voltar</button>');}
 function acaoCobranca(id,acao){
   if(acao==='reativar')reativarCobranca(id);
   else{var motivo=prompt(acao==='pausar'?'Motivo da pausa:':'Motivo do cancelamento:');if(motivo===null)return;if(acao==='pausar')pausarCobranca(id,motivo);else cancelarCobranca(id,motivo);}
@@ -105,7 +132,7 @@ function historicoCobranca(id){var r=localizarAtendimentoCobranca(id);if(!r||!r.
 function abrirPainelCobrancas(){
   var grupos={vence_hoje:[],atrasada:[],proxima:[],preparada:[],enviada:[],sem_valor:[],pausada:[],paga:[],cancelada:[]},nomes={vence_hoje:'Vence hoje',atrasada:'Atrasadas sem nova promessa',proxima:'Próximas',preparada:'Preparadas manualmente',enviada:'Cobrança enviada (confirmação manual)',sem_valor:'Sem valor devido — revisar',pausada:'Pausadas',paga:'Pagas recentemente',cancelada:'Canceladas'};
   DB.robos.forEach(function(r){if(r.cobranca)grupos[estadoCobranca(r)].push(r);});
-  var html='<div id="cobrancas-painel"></div><div class="modal-title">FINANCEIRO · COBRANÇAS</div><p>Uma cobrança por promessa. Nenhum envio automático.</p><label>Nova promessa<select id="cob-nova" class="form-input"><option value="">Selecione atendimento</option>'+DB.robos.filter(function(r){return !atendimentoPago(r)&&getValorCobravel(r)>0;}).map(function(r){var c=DB.clientes.find(function(x){return x.id===r.clienteId;});return '<option value="'+esc(r.id)+'">'+esc((c?c.nome:'—')+' · '+descricaoEquipamento(r)+' · '+(r.numOS||'#'+r.numVisual))+'</option>';}).join('')+'</select></label><button class="btn btn-cyan" onclick="if(document.getElementById(\'cob-nova\').value)abrirEditorCobranca(document.getElementById(\'cob-nova\').value)">Programar / reagendar</button>';
+  var html='<div id="cobrancas-painel"></div><div class="modal-title">FINANCEIRO · COBRANÇAS</div><p>Painel de acompanhamento. Novos pagamentos combinados são registrados no card ou na ficha do equipamento. Nenhum envio automático.</p>';
   Object.keys(grupos).forEach(function(estado){var lista=grupos[estado];html+='<div class="section-title">'+nomes[estado]+' · '+lista.length+'</div>'+lista.map(function(r){var c=DB.clientes.find(function(x){return x.id===r.clienteId;});return '<div class="card"><strong>'+esc(c?c.nome:'—')+' · '+esc(descricaoEquipamento(r))+'</strong><div>OS '+esc(r.numOS||'—')+' · '+fmtVal(getValorCobravel(r))+' · Promessa '+fmtData(r.cobranca.dataPrometida)+'</div><div>'+(estado==='proxima'?(r.cobranca.status==='reagendada'?'REAGENDADA':'PROMESSA DE PAGAMENTO'):nomes[estado])+'</div><div class="robot-actions">'+(estado!=='paga'?'<button class="btn btn-cyan" data-id="'+esc(r.id)+'" onclick="abrirEditorCobranca(this.dataset.id)">Reagendar</button>':'')+(['paga','pausada','cancelada','sem_valor'].indexOf(estado)<0?'<button class="btn btn-wa" data-id="'+esc(r.id)+'" onclick="prepararCobranca(this.dataset.id)">COBRAR AGORA</button><button class="btn btn-close" data-id="'+esc(r.id)+'" onclick="acaoCobranca(this.dataset.id,\'pausar\')">Pausar</button>':'')+(estado==='pausada'?'<button class="btn btn-cyan" data-id="'+esc(r.id)+'" onclick="acaoCobranca(this.dataset.id,\'reativar\')">Reativar</button>':'')+(['paga','cancelada'].indexOf(estado)<0?'<button class="btn btn-close" data-id="'+esc(r.id)+'" onclick="acaoCobranca(this.dataset.id,\'cancelar\')">Cancelar</button><button class="btn btn-green" data-id="'+esc(r.id)+'" onclick="marcarRoboPago(this.dataset.id)">Marcar pago</button>':'')+'<button class="btn btn-close" data-id="'+esc(r.id)+'" onclick="historicoCobranca(this.dataset.id)">Histórico</button></div></div>';}).join('');});
   openModal(html+'<div class="modal-actions"><button class="btn btn-close" onclick="abrirResumoFinanceiro()">Voltar ao Financeiro</button><button class="btn btn-close" onclick="closeModal()">Fechar</button></div>');
 }
