@@ -27,7 +27,7 @@ html:not([data-access-validado="sim"]) body > :not(#login-overlay):not(#qr-escol
 <body>
 <script src="shared/auth/acesso.js"></script>
 <div id="app-header">
-  <div style="position:absolute;top:8px;right:10px;z-index:5;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;color:#00b8d9;background:rgba(0,184,217,.08);border:1px solid rgba(0,184,217,.28);border-radius:7px;padding:3px 7px;letter-spacing:.4px;">Versão 2.13</div>
+  <div style="position:absolute;top:8px;right:10px;z-index:5;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;color:#00b8d9;background:rgba(0,184,217,.08);border:1px solid rgba(0,184,217,.28);border-radius:7px;padding:3px 7px;letter-spacing:.4px;">Versão 2.14</div>
   <img src="https://moledo-eletrotech.github.io/MoLeDo-/logo.png" style="max-height:115px;width:auto;display:block;margin:0 auto;" alt="MoLeDo ElEtRoTeCh">
 </div>
 <div id="alert-banner"><div id="alert-pulse"></div><div id="alert-ticker-wrap"><div id="alert-ticker"><span id="alert-text"></span></div></div></div>
@@ -36,7 +36,6 @@ html:not([data-access-validado="sim"]) body > :not(#login-overlay):not(#qr-escol
   <button class="tab-btn" onclick="switchTab('diagnostico')">💊 Diagnóst.<span class="tab-badge yellow" id="badge-diag" style="display:none"></span></button>
   <button class="tab-btn" onclick="switchTab('fila')">🔧 Fila</button>
   <button class="tab-btn" onclick="switchTab('garantia')">🛡️ Garantia</button>
-  <button class="tab-btn" onclick="switchTab('alertas')">🚨 Alertas<span class="tab-badge orange" id="badge-alertas" style="display:none"></span></button>
   <button class="tab-btn" onclick="switchTab('etiqueta')">🏷️ Etiquetas</button>
   <button class="tab-btn" onclick="switchTab('relatorio')">📊 Relatório</button>
   <button class="tab-btn" onclick="switchTab('lixeira')">🗑️ Lixeira<span class="tab-badge gray" id="badge-lixeira" style="display:none"></span></button>
@@ -81,7 +80,6 @@ html:not([data-access-validado="sim"]) body > :not(#login-overlay):not(#qr-escol
     <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" onclick="salvarCheckin()">✅ Salvar Check-in</button>
   </div>
   <div id="tab-fila" class="tab-pane"><div id="fila-list"></div></div>
-  <div id="tab-alertas" class="tab-pane"><div id="alertas-list"></div></div>
   <div id="tab-garantia" class="tab-pane"><div id="garantia-list"></div></div>
   <div id="tab-lixeira" class="tab-pane"><div id="lixeira-list"></div></div>
   <div id="tab-etiqueta" class="tab-pane"><div id="etiqueta-ui"></div></div>
@@ -204,7 +202,6 @@ html:not([data-access-validado="sim"]) body > :not(#login-overlay):not(#qr-escol
 <script src="modules/fila/fila.js"></script>
 <script src="modules/garantia/garantia.js"></script>
 <script src="modules/garantia/retorno.js"></script>
-<script src="modules/alertas/alertas.js"></script>
 <script src="modules/alertas/ticker.js"></script>
 <script src="modules/alertas/aguardando-peca.js"></script>
 <script src="modules/lembretes/lembretes.js"></script>
@@ -225,9 +222,6 @@ html:not([data-access-validado="sim"]) body > :not(#login-overlay):not(#qr-escol
 <script src="modules/lixeira/arquivamento.js"></script>
 <script src="modules/lixeira/restauracao.js"></script>
 <script src="modules/lixeira/retencao.js"></script>
-<script src="modules/modo-tv/modo-tv.js"></script>
-<script src="modules/modo-tv/render.js"></script>
-<script src="modules/modo-tv/timers.js"></script>
 <script src="shared/whatsapp/mensagens.js"></script>
 <script src="shared/whatsapp/abertura.js"></script>
 <script src="shared/ia/texto.js"></script>
@@ -350,9 +344,6 @@ async function loadFromFirebase(){
       if(!window.DB.defeitosCI.length){
         window.DEFEITOS.forEach(function(cat){cat.items.forEach(function(item){window.DB.defeitosCI.push({id:window.genId(),cat:cat.cat,nome:item,ativo:true});});});
       }
-      // restaura statusTV sempre do Firebase
-      window._tvStatusMap={};
-      window.DB.robos.forEach(function(r){window._tvStatusMap[r.id]=r.statusTV||'fila';});
       try{localStorage.setItem('moledo_v5',JSON.stringify(window.DB));}catch(e){}
       window.renderAll();
       hideSyncToast('☁️ Dados sincronizados!');
@@ -544,11 +535,6 @@ function addLogoutBtn(){
     btnRel.id='btn-relatorio';btnRel.textContent='📋';
     btnRel.style.cssText='background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--cyan);border-radius:6px;padding:3px 9px;font-size:13px;cursor:pointer;';
     btnRel.onclick=abrirFiltroRelatorio;toolbar.appendChild(btnRel);
-    // TV
-    var btnTV=document.createElement('button');
-    btnTV.id='btn-tv';btnTV.textContent='📺 TV';
-    btnTV.style.cssText='background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.25);color:#ffd600;border-radius:6px;padding:3px 9px;font-family:\'Rajdhani\',sans-serif;font-size:11px;font-weight:700;cursor:pointer;';
-    btnTV.onclick=abrirModoTV;toolbar.appendChild(btnTV);
     // 💵 resumo financeiro (na ordem certa, antes do Sair)
     var cValor=document.createElement('span');
     cValor.id='cnt-valor';

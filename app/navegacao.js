@@ -16,7 +16,6 @@ function renderTab(tab){
   if(tab==='clientes')renderClientes();
   else if(tab==='checkin')renderCheckin();
   else if(tab==='fila')renderFila();
-  else if(tab==='alertas')renderAlertas();
   else if(tab==='garantia')renderGarantia();
   else if(tab==='lixeira')renderLixeira();
   else if(tab==='etiqueta')renderEtiqueta();

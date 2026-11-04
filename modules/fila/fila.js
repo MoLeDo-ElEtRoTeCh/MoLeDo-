@@ -1,8 +1,25 @@
+var filtroFila='todos';
+
+function estadoFiltroFila(r){
+  if(r.servicoPronto)return'servico_pronto';
+  if(r.aguardandoPeca)return'aguardando_peca';
+  if(r.diagnostico)return'diagnostico';
+  if(r.bancada||r.entradaBancada)return'bancada';
+  return'checkin';
+}
+
+function setFiltroFila(filtro){filtroFila=filtro;renderFila();}
+
 function renderFila(){
   var el=document.getElementById('fila-list');
   var hoje=new Date();hoje.setHours(0,0,0,0);
-  var todos=DB.robos.filter(function(r){return r.status==='reparo';}).sort(function(a,b){return a.dataEntrada<b.dataEntrada?-1:a.dataEntrada>b.dataEntrada?1:a.numVisual-b.numVisual;});
-  if(!todos.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🔧</div><p>Nenhum robô em reparo.</p></div>';return;}
+  var universo=DB.robos.filter(function(r){return r.status==='reparo';});
+  var filtros=[['todos','TODOS'],['checkin','CHECK-IN'],['bancada','BANCADA'],['diagnostico','DIAGNÓSTICO'],['aguardando_peca','AGUARDANDO PEÇA'],['servico_pronto','SERVIÇO PRONTO']];
+  var quantidades={todos:universo.length,checkin:0,bancada:0,diagnostico:0,aguardando_peca:0,servico_pronto:0};
+  universo.forEach(function(r){quantidades[estadoFiltroFila(r)]++;});
+  var barra='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">'+filtros.map(function(item){return'<button class="btn '+(filtroFila===item[0]?'btn-cyan':'btn-close')+'" style="flex:1;min-width:105px;justify-content:center;font-size:11px;" onclick="setFiltroFila(\''+item[0]+'\')">'+item[1]+' ('+quantidades[item[0]]+')</button>';}).join('')+'</div>';
+  var todos=universo.filter(function(r){return filtroFila==='todos'||estadoFiltroFila(r)===filtroFila;}).sort(function(a,b){return a.dataEntrada<b.dataEntrada?-1:a.dataEntrada>b.dataEntrada?1:a.numVisual-b.numVisual;});
+  if(!todos.length){el.innerHTML=barra+'<div class="empty-state"><div class="empty-icon">🔧</div><p>Nenhum atendimento neste filtro.</p></div>';return;}
   // Separar por categoria
   var criticos=[], proximoAtraso=[], agPeca=[], emAnalise=[], noPrazo=[];
   var aguardRetirada=[];
@@ -52,7 +69,7 @@ function renderFila(){
           '</div></div>';
       }).join('');
   }
-  el.innerHTML=
+  el.innerHTML=barra+
     secaoFila('📦 AGUARDANDO RETIRADA','#00c896',aguardRetirada)+
     secaoFila('🔥 CRÍTICO — mais de 40 dias','var(--orange)',criticos)+
     secaoFila('⚠️ PRÓXIMO DO ATRASO','#ff4444',proximoAtraso)+

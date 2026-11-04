@@ -13,7 +13,10 @@ function renderClientes(){
   var lista=[...DB.clientes].sort(function(a,b){return a.nome.localeCompare(b.nome,'pt-BR');});
   if(filtroCliente==='cf')lista=lista.filter(function(c){return !c.tipo||c.tipo==='cf';});
   else if(filtroCliente==='vd')lista=lista.filter(function(c){return c.tipo==='vd'||c.tipo==='vc';});
-  else if(filtroCliente==='inativo')lista=lista.filter(function(c){return c.inativo;});
+  else if(filtroCliente==='inativo')lista=lista.filter(function(c){return (c.tipo==='vd'||c.tipo==='vc')&&c.inativo;});
+  var inativos=DB.clientes.filter(function(c){return (c.tipo==='vd'||c.tipo==='vc')&&c.inativo;}).length;
+  var botaoInativos=document.getElementById('fc-inativo');
+  if(botaoInativos)botaoInativos.textContent='💤 Inativos ('+inativos+')';
   if(!lista.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">👤</div><p>Nenhum cliente encontrado.<br>Use a aba Check-in.</p></div>';return;}
   el.innerHTML=lista.map(function(c){
     var ativos=getAtivos(c.id),gars=getGar(c.id),atras=getAtras(c.id);

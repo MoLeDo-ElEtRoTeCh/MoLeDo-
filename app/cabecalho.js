@@ -19,6 +19,21 @@ function renderContador(){
   if(el)el.innerHTML='';
 }
 
+// Badges compartilhados que continuam existindo sem a antiga aba Alertas.
+function renderBadges(){
+  var lixeira=document.getElementById('badge-lixeira');
+  if(lixeira){
+    if(DB.lixeira.length){lixeira.textContent=DB.lixeira.length;lixeira.style.display='inline-block';}
+    else lixeira.style.display='none';
+  }
+  var pendentes=DB.robos.filter(function(r){return r.status==='reparo'&&(r.bancada||r.entradaBancada)&&!r.diagnostico;}).length;
+  var diagnostico=document.getElementById('badge-diag');
+  if(diagnostico){
+    if(pendentes){diagnostico.textContent=pendentes;diagnostico.style.display='inline-block';diagnostico.className='tab-badge gray';}
+    else diagnostico.style.display='none';
+  }
+}
+
 function criarBotaoFlutuante(){
   if(document.getElementById('btn-fab'))return;
   var fab=document.createElement('button');

@@ -1,20 +1,32 @@
+var filtroDiagnostico='todos';
+
+function estadoFiltroDiagnostico(r){
+  if(r.diagnostico)return'concluidos';
+  if(r.status==='reparo'&&(r.bancada||r.entradaBancada))return'em_diagnostico';
+  return'aguardando';
+}
+
+function setFiltroDiagnostico(filtro){filtroDiagnostico=filtro;renderDiagnosticoLista();}
+
 function renderDiagnosticoLista(){
   var el=document.getElementById('diagnostico-list');
-  // TODOS os robôs que entraram na bancada (com ou sem diagnóstico)
-  var robos=DB.robos.filter(function(r){
-    return r.status==='reparo'&&(r.bancada||r.entradaBancada||r.diagnostico);
-  }).sort(function(a,b){
+  var universo=DB.robos.filter(function(r){return r.status==='reparo'||!!r.diagnostico;});
+  var quantidades={todos:universo.length,aguardando:0,em_diagnostico:0,concluidos:0};
+  universo.forEach(function(r){quantidades[estadoFiltroDiagnostico(r)]++;});
+  var robos=universo.filter(function(r){return filtroDiagnostico==='todos'||estadoFiltroDiagnostico(r)===filtroDiagnostico;}).sort(function(a,b){
     // Sem diagnóstico primeiro, depois por data
     var ta=a.diagnostico?1:0, tb=b.diagnostico?1:0;
     if(ta!==tb)return ta-tb;
     return a.dataEntrada<b.dataEntrada?-1:1;
   });
   var semDiag=robos.filter(function(r){return !r.diagnostico;}).length;
+  var filtros=[['todos','TODOS'],['aguardando','AGUARDANDO'],['em_diagnostico','EM DIAGNÓSTICO'],['concluidos','CONCLUÍDOS']];
+  var barra='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">'+filtros.map(function(item){return'<button class="btn '+(filtroDiagnostico===item[0]?'btn-cyan':'btn-close')+'" style="flex:1;min-width:120px;justify-content:center;font-size:11px;" onclick="setFiltroDiagnostico(\''+item[0]+'\')">'+item[1]+' ('+quantidades[item[0]]+')</button>';}).join('')+'</div>';
   var topo='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'+
     '<div style="font-family:\'Orbitron\',monospace;font-size:12px;font-weight:700;color:var(--cyan2);letter-spacing:2px;text-transform:uppercase;">💊 Diagnósticos'+(semDiag?' · '+semDiag+' pendente'+(semDiag>1?'s':''):'')+'</div>'+
     '<button class="btn btn-close" onclick="abrirConfigDiag()" style="font-size:13px;padding:7px 12px;">⚙️ Config</button></div>';
-  if(!robos.length){el.innerHTML=topo+'<div class="empty-state"><div class="empty-icon">💊</div><p>Nenhum robô em bancada ainda.</p></div>';return;}
-  el.innerHTML=topo+robos.map(function(r){
+  if(!robos.length){el.innerHTML=topo+barra+'<div class="empty-state"><div class="empty-icon">💊</div><p>Nenhum atendimento neste filtro.</p></div>';return;}
+  el.innerHTML=topo+barra+robos.map(function(r){
     var c=DB.clientes.find(function(x){return x.id===r.clienteId;});
     var num='#'+String(r.numVisual).padStart(3,'0');var tem=!!r.diagnostico;
     return'<div class="card'+(tem?' diag-card':'')+'">'+

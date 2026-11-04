@@ -175,26 +175,6 @@ var filtroCliente='todos';
 
 
 
-// ── MODO TV ──
-var _tvStatusMap={};
-var _tvFrasesBiblicas=[
-  '"Tudo posso naquele que me fortalece." — Filipenses 4:13',
-  '"O Senhor é o meu pastor e nada me faltará." — Salmos 23:1',
-  '"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito." — João 3:16',
-  '"Sede fortes e corajosos. Não temais." — Josué 1:9',
-  '"Confia no Senhor de todo o teu coração." — Provérbios 3:5',
-  '"O Senhor é a minha luz e a minha salvação; a quem temerei?" — Salmos 27:1',
-  '"Pedi e dar-se-vos-á; buscai e achareis." — Mateus 7:7',
-  '"Bem-aventurados os mansos, porque herdarão a terra." — Mateus 5:5',
-  '"A fé é a certeza daquilo que esperamos." — Hebreus 11:1',
-  '"O amor é paciente, é bondoso." — 1 Coríntios 13:4',
-  '"Deus é o nosso refúgio e força, socorro bem presente." — Salmos 46:1',
-  '"Alegrai-vos sempre no Senhor." — Filipenses 4:4',
-  '"Não vos inquieteis com nada." — Filipenses 4:6',
-  '"Com Deus faremos proezas." — Salmos 60:12',
-  '"O Senhor está comigo; não temerei." — Salmos 118:6'
-];
-var _tvFraseIdx=Math.floor(Math.random()*_tvFrasesBiblicas.length);
 
 
 
