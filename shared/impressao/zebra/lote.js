@@ -43,7 +43,7 @@ async function imprimirSelecionadas(){
       var c=r&&DB.clientes.find(function(x){return x.id===r.clienteId;});
       if(!r||(r.status!=='reparo'&&r.status!=='garantia'))throw new Error('Equipamento indisponível.');
       var valid=zebraMontarPayload(r,c);
-      snapshots[id]={r:Object.assign({},valid.robo,{nomeClienteFinal:r.nomeClienteFinal||''}),c:Object.assign({},valid.cliente,{tipo:c.tipo||'cf'})};
+      snapshots[id]={r:Object.assign({},valid.robo,{nomeClienteFinal:r.nomeClienteFinal||'',obs:r.obs||''}),c:Object.assign({},valid.cliente,{tipo:c.tipo||'cf'})};
       var q=Math.max(1,Math.min(20,Math.floor(Number(etqCopias[id]))||1));
       for(var k=0;k<q;k++)items.push({roboId:id,numVisual:r.numVisual,copy:k+1,copies:q,jobId:crypto.randomUUID().toLowerCase(),state:'not_sent'});
     });

@@ -96,7 +96,8 @@ async function zebraRenderizarCanvas(r,c){
   var sn=String(r.sn||'SEM CÓDIGO').trim().toUpperCase();
   var entrada=fmtData(r.dataEntrada);
   var volt=String(r.voltagem||'—').trim().toUpperCase();
-  var defeito=(Array.isArray(r.defeitos)&&r.defeitos.length?r.defeitos.join(' / '):'NÃO INFORMADO').trim().toUpperCase();
+  var defeito=[Array.isArray(r.defeitos)&&r.defeitos.length?r.defeitos.join(' / '):'',String(r.obs||'').trim()].filter(function(texto){return texto.trim();}).join(' / ')||'NÃO INFORMADO';
+  defeito=defeito.trim().toUpperCase();
   var num=String(Number(r.numVisual||0)).padStart(3,'0');
 
   // Número depois do # fixo do template
