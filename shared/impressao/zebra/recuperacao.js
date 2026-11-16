@@ -33,7 +33,7 @@ async function zebraResolverUncertain(resultado){
   zebraCheckUid(p.uid);
   var data=await zebraPrintApi('/jobs/'+ZEBRA_PRINTER_ID+'/'+encodeURIComponent(p.jobId)+'/resolve','POST',{acknowledge_uncertain:true});
   if(!data||data.job_id!==p.jobId)throw new Error('UUID_DIVERGENTE');
-  if(resultado==='printed')zebraMarcarImpressa(p.roboId);
+  if(resultado==='printed'&&p.kind!=='nota')zebraMarcarImpressa(p.roboId);
   if(p.batch)zebraAvancarResolvido(p,'uncertain_resolved_'+resultado);else zebraLimparPendente();
   zebraCooldownUntil=Date.now()+7000;closeModal();renderEtiqueta();
   showToast('Resolução registrada. Nenhum reenvio; restantes pausados.',8000);

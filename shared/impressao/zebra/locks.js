@@ -1,4 +1,4 @@
-['imprimirSelecionadas','zebraExecutarProximoLote','zebraConsultarPendente',
+['imprimirSelecionadas','zebraImprimirNota','zebraExecutarProximoLote','zebraConsultarPendente',
  'zebraRetomarPendente','zebraContinuarLote','zebraCancelarLote',
  'zebraFinalizarLote','zebraFinalizarUsbSent','zebraEncerrarFalha',
  'zebraResolverUncertain'].forEach(function(name){

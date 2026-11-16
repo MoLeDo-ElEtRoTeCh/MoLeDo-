@@ -153,6 +153,7 @@ function zebraRenderLoteCard(b){
   var unsent=b.items.filter(function(x){return x.state==='not_sent';}).length;
   var title=b.state==='running'?'Enviando '+Math.min(b.index+1,total)+'/'+total:'Lote pausado · item '+Math.min(b.index+1,total)+'/'+total;
   if(b.state==='awaiting_confirmation')title='Envios encerrados · '+sent+'/'+total+' enviados à Zebra';
+  if(b.kind==='nota')title='Nota · '+title;
   var actions='';
   if(!pending&&b.state==='awaiting_confirmation')actions='<button class="btn btn-green" onclick="zebraAbrirConfirmacaoLote()">Conferir etiquetas físicas</button>';
   else if(!pending&&b.state!=='running')actions='<button class="btn btn-cyan" onclick="zebraContinuarLote()">Continuar somente os não enviados</button><button class="btn btn-close" onclick="zebraCancelarLote()">Encerrar lote</button>';

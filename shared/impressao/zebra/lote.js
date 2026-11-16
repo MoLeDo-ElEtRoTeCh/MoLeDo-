@@ -67,12 +67,12 @@ async function zebraExecutarProximoLote(){
   zebraActionLocked=true;
   var creationResponseReceived=false;
   try{
-    var payload=await zebraMontarPayloadBitmap(snapshot.r,snapshot.c);
+    var payload=b.kind==='nota'?zebraPayloadPaginaNota(snapshot,item):await zebraMontarPayloadBitmap(snapshot.r,snapshot.c);
     payload.job_id=item.jobId;
     var ctx=await window._getPrintAuthContext(false);zebraCheckUid(b.uid);
     if(ctx.uid!==b.uid)throw new Error('USUARIO_ALTERADO');
     // Save pending FIRST. A crash at any following point blocks new POSTs.
-    zebraSalvarPendente({v:1,uid:b.uid,printerId:ZEBRA_PRINTER_ID,jobId:item.jobId,roboId:item.roboId,numVisual:item.numVisual,createdAt:Date.now(),state:'creating',batch:true,batchIndex:b.index,batchTotal:b.items.length});
+    zebraSalvarPendente({v:1,uid:b.uid,printerId:ZEBRA_PRINTER_ID,jobId:item.jobId,roboId:item.roboId,numVisual:item.numVisual,createdAt:Date.now(),state:'creating',kind:b.kind||'garantia',batch:true,batchIndex:b.index,batchTotal:b.items.length});
     item.state='creating';item.attemptedAt=Date.now();zebraSalvarLote(b);
     var data=await zebraPrintApi('/print-bitmap','POST',payload,ctx,false);
     creationResponseReceived=true;zebraRegistrarEstadoImpressora('online','job_accepted');
@@ -98,7 +98,7 @@ function zebraAbrirConfirmacaoLote(){
   var b=zebraLerLote();if(!b||b.state!=='awaiting_confirmation')return;
   var qtd=(b.completed||[]).length;
   openModal('<div class="modal-title">✅ Confirmar lote Zebra</div>'+ 
-    '<div style="font-size:13px;color:var(--text2);line-height:1.6;">O sistema enviou <b>'+qtd+' etiqueta(s)</b> à Zebra.<br><br>Confirma fisicamente que saíram exatamente <b>'+qtd+' etiqueta(s) completas e corretas</b>?<br><br><b>Só esta confirmação marca os equipamentos como impressos.</b></div>'+ 
+    '<div style="font-size:13px;color:var(--text2);line-height:1.6;">O sistema enviou <b>'+qtd+' etiqueta(s)</b> à Zebra.<br><br>Confirma fisicamente que saíram exatamente <b>'+qtd+' etiqueta(s) completas e corretas</b>?<br><br><b>'+ (b.kind==='nota'?'Esta confirmação é apenas das notas; não marca a etiqueta de garantia como impressa.':'Só esta confirmação marca os equipamentos como impressos.') +'</b></div>'+
     '<div class="modal-actions"><button class="btn btn-del" onclick="zebraFinalizarLote(false)">⚠️ Houve problema</button><button class="btn btn-green" onclick="zebraFinalizarLote(true)">✅ Sim, saíram todas</button></div>');
 }
 
@@ -106,7 +106,7 @@ function zebraFinalizarLote(saiu){
   var b=zebraLerLote();if(!b||b.state!=='awaiting_confirmation')return;
   zebraCheckUid(b.uid);
   if(saiu){
-    b.completed.forEach(function(x){zebraMarcarImpressa(x.roboId);});
+    if(b.kind!=='nota')b.completed.forEach(function(x){zebraMarcarImpressa(x.roboId);});
     b.physicalConfirmed=true;
   }else b.physicalConfirmed=false;
   zebraSalvarLote(b);zebraLimparLote();etqSel=[];closeModal();renderEtiqueta();
