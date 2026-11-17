@@ -1,16 +1,9 @@
-function zebraAbrirConfirmacaoUsb(saiu){
-  var p=zebraLerPendente();if(!p||p.state!=='usb_sent'||p.batch)return;
-  var texto=saiu?'Confirma que saiu exatamente UMA etiqueta completa e correta na Zebra?':'Confirma que a etiqueta NÃO saiu corretamente (não saiu, saiu parcial ou apresentou problema)?';
-  openModal('<div class="modal-title">'+(saiu?'✅ Confirmar etiqueta':'⚠️ Etiqueta não confirmada')+'</div>'+ 
-    '<div style="font-size:13px;color:var(--text2);line-height:1.6;">'+texto+'<br><br><b>Esta confirmação é física.</b> O estado usb_sent sozinho não comprova impressão.</div>'+ 
-    '<div class="modal-actions"><button class="btn btn-close" onclick="closeModal()">Voltar</button><button class="btn '+(saiu?'btn-green':'btn-del')+'" onclick="zebraFinalizarUsbSent('+(saiu?'true':'false')+')">'+(saiu?'✅ Sim, saiu correta':'⚠️ Confirmo o problema')+'</button></div>');
+function zebraAbrirConfirmacaoUsb(){
+  zebraLiberarEnviosConcluidos();renderEtiqueta();
 }
 
-function zebraFinalizarUsbSent(saiu){
-  var p=zebraLerPendente();if(!p||p.state!=='usb_sent'||p.batch)return;
-  zebraCheckUid(p.uid);
-  if(saiu)zebraMarcarImpressa(p.roboId);
-  zebraLimparPendente();etqSel=[];closeModal();renderEtiqueta();
+function zebraFinalizarUsbSent(){
+  zebraLiberarEnviosConcluidos();closeModal();renderEtiqueta();
 }
 
 function zebraEncerrarFalha(){
@@ -52,6 +45,7 @@ function zebraAvancarResolvido(p,state){
   var item=b.items[Number(p.batchIndex)];
   if(!item||(item.jobId&&item.jobId!==p.jobId))throw new Error('UUID divergente.');
   item.state=state;b.index=Math.max(b.index,Number(p.batchIndex)+1);
-  b.state=b.index>=b.items.length?'awaiting_confirmation':'paused_after_failed';
+  b.state=b.index>=b.items.length?'completed':'paused_after_failed';
   zebraSalvarLote(b);zebraLimparPendente();
+  if(b.index>=b.items.length)zebraConcluirLoteAutomatico();
 }

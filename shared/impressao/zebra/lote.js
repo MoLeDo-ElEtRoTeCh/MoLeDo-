@@ -59,7 +59,7 @@ async function zebraExecutarProximoLote(){
   if(!b||b.state!=='running'||zebraActionLocked||zebraLerPendente())return;
   zebraCheckUid(b.uid);
   if(b.v!==2){zebraPausarLote('Lote antigo: encerre e confira o histórico antes de criar outro.');return;}
-  if(b.index>=b.items.length){b.state='awaiting_confirmation';zebraSalvarLote(b);return;}
+  if(b.index>=b.items.length){zebraConcluirLoteAutomatico();return;}
   if(Date.now()<zebraCooldownUntil){zebraAgendarProximoLote(zebraCooldownUntil-Date.now()+150);return;}
   var item=b.items[b.index],snapshot=b.snapshots[item.roboId];
   // Durable attempted marker is never cleared or used for another POST.
@@ -94,22 +94,13 @@ async function zebraExecutarProximoLote(){
   }finally{zebraActionLocked=false;renderEtiqueta();}
 }
 
+// Compatibility with old handlers: finished jobs are released without a dialog.
 function zebraAbrirConfirmacaoLote(){
-  var b=zebraLerLote();if(!b||b.state!=='awaiting_confirmation')return;
-  var qtd=(b.completed||[]).length;
-  openModal('<div class="modal-title">✅ Confirmar lote Zebra</div>'+ 
-    '<div style="font-size:13px;color:var(--text2);line-height:1.6;">O sistema enviou <b>'+qtd+' etiqueta(s)</b> à Zebra.<br><br>Confirma fisicamente que saíram exatamente <b>'+qtd+' etiqueta(s) completas e corretas</b>?<br><br><b>'+ (b.kind==='nota'?'Esta confirmação é apenas das notas; não marca a etiqueta de garantia como impressa.':'Só esta confirmação marca os equipamentos como impressos.') +'</b></div>'+
-    '<div class="modal-actions"><button class="btn btn-del" onclick="zebraFinalizarLote(false)">⚠️ Houve problema</button><button class="btn btn-green" onclick="zebraFinalizarLote(true)">✅ Sim, saíram todas</button></div>');
+  zebraLiberarEnviosConcluidos();renderEtiqueta();
 }
 
-function zebraFinalizarLote(saiu){
-  var b=zebraLerLote();if(!b||b.state!=='awaiting_confirmation')return;
-  zebraCheckUid(b.uid);
-  if(saiu){
-    if(b.kind!=='nota')b.completed.forEach(function(x){zebraMarcarImpressa(x.roboId);});
-    b.physicalConfirmed=true;
-  }else b.physicalConfirmed=false;
-  zebraSalvarLote(b);zebraLimparLote();etqSel=[];closeModal();renderEtiqueta();
+function zebraFinalizarLote(){
+  zebraLiberarEnviosConcluidos();closeModal();renderEtiqueta();
 }
 
 function zebraCancelarLote(){
@@ -122,7 +113,7 @@ function zebraContinuarLote(){
   var b=zebraLerLote();if(!b||zebraLerPendente())return;
   zebraCheckUid(b.uid);
   if(b.v!==2)throw new Error('Encerre o lote da versão anterior.');
-  if(b.index>=b.items.length){b.state='awaiting_confirmation';zebraSalvarLote(b);zebraAbrirConfirmacaoLote();return;}
+  if(b.index>=b.items.length){zebraConcluirLoteAutomatico();renderEtiqueta();return;}
   if(b.items[b.index].state!=='not_sent')throw new Error('Item já tentado: não pode ser reenviado.');
   b.state='running';delete b.lastError;zebraSalvarLote(b);zebraAgendarProximoLote(500);
 }

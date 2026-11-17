@@ -126,11 +126,6 @@ function zebraRenderStatusCard(p){
   var actions='';
   if(['creating','queued','claimed','sending','reconcile'].indexOf(p.state)!==-1){
     actions='<button class="btn btn-cyan" style="margin-top:9px;" onclick="zebraConsultarPendente(true)">🔄 Atualizar agora</button>';
-  }else if(p.state==='usb_sent'&&!p.batch){
-    actions='<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;">'+
-      '<button class="btn btn-green" onclick="zebraAbrirConfirmacaoUsb(true)">✅ Saiu correta</button>'+ 
-      '<button class="btn btn-del" onclick="zebraAbrirConfirmacaoUsb(false)">⚠️ Não saiu correta</button>'+ 
-      '</div>';
   }else if(p.state==='failed'){
     actions='<button class="btn btn-close" style="margin-top:9px;" onclick="zebraEncerrarFalha()">Entendi · tratar falha</button>';
   }else if(p.state==='uncertain'){
@@ -155,9 +150,9 @@ function zebraRenderLoteCard(b){
   if(b.state==='awaiting_confirmation')title='Envios encerrados · '+sent+'/'+total+' enviados à Zebra';
   if(b.kind==='nota')title='Nota · '+title;
   var actions='';
-  if(!pending&&b.state==='awaiting_confirmation')actions='<button class="btn btn-green" onclick="zebraAbrirConfirmacaoLote()">Conferir etiquetas físicas</button>';
+  if(!pending&&b.state==='awaiting_confirmation')actions='<button class="btn btn-green" onclick="zebraAbrirConfirmacaoLote()">Atualizar envios concluídos</button>';
   else if(!pending&&b.state!=='running')actions='<button class="btn btn-cyan" onclick="zebraContinuarLote()">Continuar somente os não enviados</button><button class="btn btn-close" onclick="zebraCancelarLote()">Encerrar lote</button>';
-  return '<div style="padding:12px;margin-bottom:10px;border:1px solid var(--cyan);border-radius:10px;"><b>'+esc(title)+'</b><p>'+sent+' dados enviados à Zebra · '+unsent+' não enviados · '+total+' solicitados.</p><p>'+esc(b.lastError||'Uma cópia por UUID. Sem retry de impressão. Confira o papel antes de confirmar.')+'</p>'+actions+'</div>';
+  return '<div style="padding:12px;margin-bottom:10px;border:1px solid var(--cyan);border-radius:10px;"><b>'+esc(title)+'</b><p>'+sent+' dados enviados à Zebra · '+unsent+' não enviados · '+total+' solicitados.</p><p>'+esc(b.lastError||'Uma cópia por UUID. Sem retry de impressão. O envio concluído libera a fila automaticamente.')+'</p>'+actions+'</div>';
 }
 
 function renderEtiqueta(){
@@ -180,14 +175,14 @@ function renderEtiqueta(){
   var html=subAbas+
     '<div style="padding:10px 12px;margin-bottom:10px;border:1px solid rgba(0,229,255,.25);background:rgba(0,229,255,.05);border-radius:10px;">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">'+
-        '<div style="font-size:13px;font-weight:800;color:var(--cyan);">Zebra ZD220 · BITMAP 480 × 320 · Pico</div>'+ 
+        '<div style="font-size:13px;font-weight:800;color:var(--cyan);">Zebra ZD220 · 60 × 40 mm</div>'+
         '<div style="font-size:11px;">'+zebraRenderEstadoImpressora()+'</div>'+ 
       '</div>'+ 
       '<div style="font-size:11px;color:var(--text3);margin-top:3px;">Uma etiqueta por job, sequencialmente, sem retry automático.</div>'+ 
     '</div>'+zebraRenderLoteCard(lote)+zebraRenderStatusCard(pending)+
     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;">'+
       '<button onclick="setEtqAba(\'nao\')" class="btn '+(etqAba==='nao'?'btn-cyan':'btn-close')+'" style="justify-content:center;padding:9px 5px;font-size:11px;">⏳ Não impressas <b>'+qtdNao+'</b></button>'+ 
-      '<button onclick="setEtqAba(\'confirmadas\')" class="btn '+(etqAba==='confirmadas'?'btn-green':'btn-close')+'" style="justify-content:center;padding:9px 5px;font-size:11px;">✅ Confirmadas <b>'+qtdConf+'</b></button>'+ 
+      '<button onclick="setEtqAba(\'confirmadas\')" class="btn '+(etqAba==='confirmadas'?'btn-green':'btn-close')+'" style="justify-content:center;padding:9px 5px;font-size:11px;">✅ Enviadas <b>'+qtdConf+'</b></button>'+
       '<button onclick="setEtqAba(\'erros\')" class="btn '+(etqAba==='erros'?'btn-yellow':'btn-close')+'" style="justify-content:center;padding:9px 5px;font-size:11px;">⚠️ Erros <b>'+qtdErr+'</b></button>'+ 
     '</div>';
 
@@ -216,10 +211,10 @@ function renderEtiqueta(){
       var sel=etqSel.indexOf(r.id)!==-1,impressa=impressas.indexOf(r.id)!==-1;
       var erroEntry=erros.slice().reverse().find(function(x){return x.roboId===r.id;});
       var nome=zebraNomeLista(r,c),subnome=zebraSubnomeLista(r,c),copias=Math.max(1,Math.min(20,Number(etqCopias[r.id]||1)));
-      var statusTxt=erroEntry?' · <span style="color:var(--orange);font-weight:800;">⚠️ erro registrado</span>':(impressa?' · <span style="color:var(--green);font-weight:800;">✅ impressão confirmada</span>':'');
+      var statusTxt=erroEntry?' · <span style="color:var(--orange);font-weight:800;">⚠️ erro registrado</span>':(impressa?' · <span style="color:var(--green);font-weight:800;">✅ enviada à Zebra</span>':'');
       var fecharErro=erroEntry?'<button title="Encerrar aviso" class="btn btn-del" style="padding:6px 8px;font-size:11px;" onclick="event.stopPropagation();zebraAbrirFecharErro(\''+erroEntry.jobId+'\')">✕</button>':'';
       var busca=zebraNormalizarBusca([c&&c.nome,r.nomeClienteFinal,descricaoEquipamento(r),r.sn,r.numVisual,'#'+String(r.numVisual||0).padStart(3,'0')].join(' '));
-      return '<div class="etq-robo-row'+(sel?' sel':'')+(impressa?' impressa':'')+'" data-etq-search="'+esc(busca)+'" onclick="toggleEtqRobo(\''+r.id+'\')">'+
+      return '<div class="etq-robo-row'+(sel?' sel':'')+(impressa?' impressa':'')+'"'+(impressa?' style="flex-wrap:wrap;"':'')+' data-etq-search="'+esc(busca)+'" onclick="toggleEtqRobo(\''+r.id+'\')">'+
         '<input type="checkbox" '+(sel?'checked':'')+' '+(locked?'disabled':'')+' onclick="event.stopPropagation();toggleEtqRobo(\''+r.id+'\')">'+
         '<div class="etq-robo-info"><div class="etq-robo-num">'+esc(nome)+' <span style="color:var(--cyan);">#'+String(r.numVisual||0).padStart(3,'0')+'</span></div>'+ 
         (subnome?'<div style="font-size:11px;color:#00c896;font-weight:800;">'+esc(subnome)+'</div>':'')+
@@ -231,14 +226,16 @@ function renderEtiqueta(){
         '</div>'+ 
         '<button class="btn btn-close" style="padding:6px 8px;font-size:11px;" onclick="event.stopPropagation();zebraAbrirPrevia(\''+r.id+'\')">👁️</button>'+ 
         '<button class="btn btn-cyan" '+(locked?'disabled':'')+' style="padding:6px 8px;font-size:11px;'+(locked?'opacity:.4;':'')+'" onclick="event.stopPropagation();imprimirUma(\''+r.id+'\')">'+(impressa?'🔁':'🖨️')+'</button>'+ 
+        (impressa?'<button class="btn btn-del" style="flex:0 0 100%;justify-content:center;" data-robo="'+esc(r.id)+'" onclick="event.stopPropagation();zebraInformarProblemaRobo(this.dataset.robo)">Não imprimiu / deu erro</button>':'')+
         fecharErro+
       '</div>';
     }).join('');
     html+='</div><div id="etq-busca-vazio" class="empty-state" style="display:none;"><div class="empty-icon">🔎</div><p>Nenhum resultado para esta pesquisa.</p></div>';
   }else{
-    var vazio=etqAba==='confirmadas'?'Nenhuma impressão confirmada.':etqAba==='erros'?'Nenhum equipamento com erro ativo.':'Nenhuma etiqueta pendente de impressão.';
+    var vazio=etqAba==='confirmadas'?'Nenhuma etiqueta enviada.':etqAba==='erros'?'Nenhum equipamento com erro ativo.':'Nenhuma etiqueta pendente de impressão.';
     html+='<div class="empty-state"><div class="empty-icon">🏷️</div><p>'+vazio+'</p></div>';
   }
+  if(etqAba==='confirmadas')html+=zebraRenderHistoricoEnvios();
   if(etqAba==='erros')html+=zebraRenderErrosSemRobo();
   el.innerHTML=html;
   filtrarEtiquetasDOM();

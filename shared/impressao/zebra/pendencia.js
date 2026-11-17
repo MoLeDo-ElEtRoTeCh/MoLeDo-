@@ -47,6 +47,7 @@ async function zebraConsultarPendente(manual,forceRefresh){
 }
 
 function zebraRetomarPendente(){
+  zebraLiberarEnviosConcluidos();
   zebraMigrarRejeicaoConfirmada();
   var b=zebraLerLote(),p=zebraLerPendente();
   if(b&&b.state==='running')zebraPausarLote('Página/sessão recarregada. Confira o progresso e continue manualmente.');
