@@ -129,7 +129,7 @@ async function zebraImprimirNota(){
     var ctx=await window._getPrintAuthContext(false);zebraCheckUid(ctx.uid);
     if(ctx.uid!==p.uid)throw new Error('Conta alterada. Abra novamente a prévia da nota.');
     var r=DB.robos.find(function(x){return x.id===p.roboId;});
-    if(!r||r._cancelado||r.entregue||!['reparo','garantia'].includes(r.status))throw new Error('Robô indisponível para impressão.');
+    if(!r||r._cancelado||!['reparo','garantia'].includes(r.status))throw new Error('Robô indisponível para impressão.');
     if(p.paginas.length<1||p.paginas.length>100)throw new Error('Quantidade de páginas inválida.');
     var items=p.paginas.map(function(_,index){return {roboId:r.id,numVisual:r.numVisual,pageIndex:index,jobId:crypto.randomUUID().toLowerCase(),state:'not_sent'};});
     var snapshots=Object.create(null);snapshots[r.id]={paginas:p.paginas.map(function(pg){return pg.bitmap;})};
